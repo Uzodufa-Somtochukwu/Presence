@@ -1,0 +1,238 @@
+
+        :root {
+            --teal-900: #0e1c1a;
+            --teal-800: #122d29;
+            --teal-700: #173a34;
+            --teal-600: #1f4d45;
+            --teal-500: #2c655d;
+            --forest-olive: #243f39;
+            --wood-brown: #7a5241;
+            --wood-brown-deep: #5f3d34;
+            --cream: #f5efe6;
+            --cream-soft: #e8dcc2;
+            --sage: #b9c9af;
+            --sage-soft: #dfe8d6;
+            --shadow: rgba(8, 11, 10, 0.18);
+            --shadow-strong: rgba(8, 11, 10, 0.28);
+            --line: rgba(245, 239, 230, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html { scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
+        ::-webkit-scrollbar { width: 18px; height: 18px; }
+        ::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, 0.12); }
+        ::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #244a41; }
+        ::-webkit-scrollbar-thumb:active { background: #1c3c35; }
+        @media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, var(--teal-900) 0%, var(--teal-800) 24%, var(--teal-700) 48%, var(--forest-olive) 100%);
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(36px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 560px;
+            height: 560px;
+            left: -120px;
+            bottom: -110px;
+            background: radial-gradient(circle, rgba(185, 201, 175, 0.18), rgba(185, 201, 175, 0.02) 58%, transparent 72%);
+        }
+
+        body::after {
+            width: 640px;
+            height: 640px;
+            right: -150px;
+            top: -120px;
+            background: radial-gradient(circle, rgba(245, 239, 230, 0.12), rgba(245, 239, 230, 0.02) 58%, transparent 72%);
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 540px);
+            background: rgba(17, 34, 31, 0.7);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: 0 18px 60px var(--shadow-strong);
+            backdrop-filter: blur(4px);
+            padding: 32px 30px 28px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            color: var(--cream);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: none;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .brand span {
+            font-size: 0.9rem;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .intro h1 {
+            margin: 0;
+            color: var(--cream);
+            font-size: clamp(2.2rem, 4vw, 3rem);
+            line-height: 1.08;
+            letter-spacing: -0.05em;
+            font-weight: 500;
+        }
+
+        .intro p {
+            margin: 12px auto 0;
+            max-width: 440px;
+            color: rgba(245, 239, 230, 0.82);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .form-card {
+            margin-top: 10px;
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .field label {
+            color: var(--cream);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .field input {
+            width: 100%;
+            background: rgba(245, 239, 230, 0.06);
+            border: 1px solid rgba(245, 239, 230, 0.18);
+            border-radius: 14px;
+            color: var(--cream);
+            padding: 14px 16px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .field input::placeholder {
+            color: rgba(245, 239, 230, 0.48);
+        }
+
+        .field input:focus {
+            border-color: rgba(245, 239, 230, 0.42);
+            box-shadow: 0 0 0 3px rgba(245, 239, 230, 0.08);
+            background: rgba(245, 239, 230, 0.09);
+        }
+
+        .field.error input {
+            border-color: rgba(214, 170, 142, 0.9);
+            box-shadow: 0 0 0 3px rgba(214, 170, 142, 0.08);
+        }
+
+        .error-message {
+            min-height: 18px;
+            color: #f4c8b0;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .primary-btn {
+            margin-top: 8px;
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            background: var(--cream);
+            color: var(--teal-900);
+            font: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 12px 28px rgba(10, 18, 17, 0.22);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 18px;
+            color: rgba(245, 239, 230, 0.82);
+            font-size: 0.98rem;
+        }
+
+        .login-link a {
+            color: var(--cream);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 560px) {
+            .page-shell {
+                padding: 24px 18px 20px;
+                border-radius: 22px;
+            }
+
+            .intro h1 {
+                font-size: 2.1rem;
+            }
+        }
+    

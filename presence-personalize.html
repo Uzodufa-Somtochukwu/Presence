@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5eee5" />
+    <title>Personalize your Presence</title>
+    <style>
+        :root {
+            --ivory: #f7f1e9;
+            --paper: #fffaf3;
+            --wood: #765344;
+            --forest: #173a34;
+            --forest-soft: #28534a;
+            --clay: #b96f58;
+            --caramel: #d4b17e;
+            --sage: #a8b698;
+            --rose: #d7a7a7;
+            --text: #263633;
+            --muted: #5b6259;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            min-height: 100%;
+            background: linear-gradient(135deg, #f7f1e9 0%, #f0e4d6 48%, #e8d8c8 100%);
+            scrollbar-width: auto;
+            scrollbar-color: #4f403a #f4e9db;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 44px 30px 54px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: var(--text);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        ::-webkit-scrollbar { width: 18px; }
+        ::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(122, 82, 65, 0.12); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #5d433b 0%, #3b2d27 100%);
+            border: 3px solid #f4e9db;
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #4a352f 0%, #2d211d 100%); }
+        ::-webkit-scrollbar-thumb:active { background: linear-gradient(180deg, #352721 0%, #241a16 100%); }
+
+        @media (pointer: coarse) {
+            ::-webkit-scrollbar { width: initial; height: initial; }
+        }
+
+        .botanical-bg,
+        .botanical-fg {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .botanical-bg { z-index: 0; opacity: 0.42; filter: blur(20px); }
+        .botanical-fg { z-index: 0; opacity: 0.72; }
+
+        .glow {
+            position: absolute;
+            width: 380px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(48px);
+        }
+        .glow.one { left: -150px; top: 8%; background: rgba(215, 167, 167, 0.4); }
+        .glow.two { right: -130px; bottom: 3%; background: rgba(168, 182, 152, 0.44); }
+        .glow.three { right: 20%; top: -220px; background: rgba(212, 177, 126, 0.34); }
+
+        .stem {
+            position: absolute;
+            width: 72px;
+            height: 250px;
+            border-left: 3px solid rgba(91, 128, 83, 0.42);
+            border-radius: 50%;
+            transform-origin: bottom;
+        }
+        .stem.left { left: 7%; bottom: -46px; transform: rotate(8deg); }
+        .stem.right { right: 8%; bottom: -40px; height: 220px; transform: rotate(-10deg); }
+
+        .leaf {
+            position: absolute;
+            width: 98px;
+            height: 48px;
+            border-radius: 100% 0 100% 0;
+            background: linear-gradient(135deg, rgba(139, 164, 119, 0.68), rgba(73, 117, 79, 0.42));
+            box-shadow: inset 0 1px 5px rgba(255,255,255,0.4);
+        }
+        .leaf.left { left: 7%; bottom: 105px; transform: rotate(12deg); }
+        .leaf.right { right: 5%; bottom: 88px; transform: rotate(190deg); }
+        .leaf.top { right: 11%; top: 14%; width: 76px; height: 38px; transform: rotate(188deg); opacity: 0.7; }
+
+        .tulip {
+            position: absolute;
+            width: 36px;
+            height: 44px;
+            border-radius: 48% 48% 44% 44%;
+            background: linear-gradient(140deg, #e8a5a0, #cb6f69);
+            clip-path: polygon(0 15%, 28% 30%, 50% 0, 72% 30%, 100% 15%, 92% 78%, 72% 100%, 28% 100%, 8% 78%);
+            filter: drop-shadow(0 3px 4px rgba(88, 51, 43, 0.12));
+        }
+        .tulip.left { left: calc(7% - 17px); bottom: 188px; transform: rotate(-8deg); }
+        .tulip.right { right: calc(8% - 17px); bottom: 155px; background: linear-gradient(140deg, #edc47d, #d68c62); transform: rotate(9deg) scale(0.86); }
+
+        .daisy {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #d9a640;
+            box-shadow: 0 -11px 0 -2px #fffaf0, 0 11px 0 -2px #fffaf0, 11px 0 0 -2px #fffaf0, -11px 0 0 -2px #fffaf0,
+                8px 8px 0 -2px #f7eee0, -8px 8px 0 -2px #f7eee0, 8px -8px 0 -2px #f7eee0, -8px -8px 0 -2px #f7eee0;
+        }
+        .daisy.left { left: 13%; top: 20%; transform: scale(0.9); }
+        .daisy.right { right: 14%; top: 27%; transform: scale(0.72); }
+
+        .wildflower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #b6a3ca;
+            box-shadow: 0 -9px 0 -2px #d7c5e1, 0 9px 0 -2px #d7c5e1, 9px 0 0 -2px #d7c5e1, -9px 0 0 -2px #d7c5e1;
+        }
+        .wildflower.one { left: 22%; bottom: 16%; transform: scale(0.7); }
+        .wildflower.two { right: 22%; bottom: 19%; background: #d78d89; transform: scale(0.65); }
+
+        .progress {
+            position: fixed;
+            left: 26px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 3;
+        }
+        .progress::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            width: 1px;
+            background: rgba(122, 82, 65, 0.2);
+            z-index: -1;
+        }
+        .progress-step {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(122, 82, 65, 0.2);
+            border-radius: 50%;
+            background: rgba(255, 250, 243, 0.88);
+            color: #5b6259;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+        .progress-step.active {
+            color: var(--ivory);
+            background: linear-gradient(135deg, var(--wood), var(--clay));
+            border-color: var(--clay);
+            box-shadow: 0 0 0 4px rgba(185, 111, 88, 0.14);
+        }
+
+        .page-shell {
+            width: min(100%, 1000px);
+            padding: 30px clamp(22px, 4vw, 48px) 34px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(122, 82, 65, 0.16);
+            border-radius: 30px;
+            background: rgba(255, 250, 243, 0.82);
+            box-shadow: 0 24px 70px rgba(70, 48, 36, 0.16), inset 0 1px rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+            animation: arrive 650ms ease both;
+        }
+        .brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 24px;
+            color: var(--forest);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+        .brand img {
+            width: 40px;
+            height: 40px;
+            padding: 6px;
+            border-radius: 50%;
+            background: var(--forest);
+            object-fit: contain;
+        }
+        .intro { max-width: 740px; margin: 0 auto 28px; text-align: center; }
+        h1 {
+            margin: 0;
+            color: var(--forest);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 500;
+            line-height: 1.15;
+        }
+        .intro p {
+            margin: 14px auto 0;
+            max-width: 680px;
+            color: #4d5a54;
+            font-size: 1.12rem;
+            line-height: 1.65;
+        }
+        .choices { display: grid; gap: 15px; }
+        .choice {
+            min-height: 168px;
+            display: grid;
+            grid-template-columns: 74px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 22px;
+            padding: 23px 28px;
+            border: 1px solid rgba(92, 70, 55, 0.15);
+            border-radius: 22px;
+            color: inherit;
+            text-decoration: none;
+            box-shadow: 0 9px 25px rgba(73, 52, 38, 0.08);
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+        .choice:hover {
+            transform: translateY(-3px);
+            border-color: rgba(92, 70, 55, 0.28);
+            box-shadow: 0 15px 30px rgba(73, 52, 38, 0.13);
+        }
+        .choice:focus-visible {
+            outline: 4px solid #315f53;
+            outline-offset: 4px;
+        }
+        .choice.name { background: linear-gradient(110deg, #f9e9df, #fff8ef 68%); }
+        .choice.avatar { background: linear-gradient(110deg, #e9eee2, #fbf7ed 68%); }
+        .choice.personality { background: linear-gradient(110deg, #f2e6e9, #fff7ee 68%); }
+        .choice-icon {
+            width: 68px;
+            height: 68px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(122, 82, 65, 0.12);
+            border-radius: 22px 22px 22px 10px;
+            background: rgba(255, 252, 247, 0.78);
+            font-size: 2rem;
+            box-shadow: 0 5px 13px rgba(84, 61, 45, 0.08);
+        }
+        .choice h2 {
+            margin: 0;
+            color: #244139;
+            font-size: 1.38rem;
+            font-weight: 650;
+            line-height: 1.3;
+        }
+        .description { margin: 6px 0 0; color: #3f5049; font-size: 1.04rem; line-height: 1.5; }
+        .supporting { margin: 6px 0 0; color: #59615a; font-size: 0.98rem; line-height: 1.5; }
+        .choice-action {
+            align-self: center;
+            min-width: 168px;
+            padding: 13px 17px;
+            border-radius: 999px;
+            background: var(--forest);
+            color: #fffaf2;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.3;
+            box-shadow: 0 5px 12px rgba(23, 58, 52, 0.16);
+        }
+        .name .choice-action { background: #8d5544; }
+        .avatar .choice-action { background: #3e6956; }
+        .personality .choice-action { background: #83515b; }
+
+        .closing {
+            margin: 27px auto 0;
+            text-align: center;
+        }
+        .closing p { margin: 5px 0; color: #4e5d54; font-size: 1.04rem; line-height: 1.55; }
+        .skip {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: #765344;
+            font-size: 1rem;
+            font-weight: 650;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 4px;
+        }
+        .skip:hover { color: var(--forest); }
+        .skip:focus-visible { outline: 3px solid #315f53; outline-offset: 3px; }
+        .finish-onboarding { display: grid; justify-items: center; gap: 5px; margin-top: 14px; color: var(--forest); text-decoration: none; }
+        .finish-onboarding span:first-child { color: #815f4e; font-size: 0.96rem; font-weight: 650; }
+        .finish-onboarding span:last-child { display: inline-block; padding: 13px 20px; border-radius: 999px; color: #fffaf2; background: var(--forest); font-size: 1rem; font-weight: 700; transition: background-color 160ms ease, transform 160ms ease; }
+        .finish-onboarding:hover span:last-child { background: #28534a; transform: translateY(-1px); }
+        .finish-onboarding:focus-visible { outline: 3px solid #315f53; outline-offset: 3px; border-radius: 999px; }
+
+        @keyframes arrive {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 760px) {
+            body { padding: 26px 18px 34px; }
+            .progress {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                margin: 0 auto 18px;
+                width: max-content;
+            }
+            .progress::before { top: 50%; bottom: auto; left: 15px; right: 15px; width: auto; height: 1px; }
+            .page-shell { padding: 22px 20px 27px; border-radius: 24px; }
+            .brand { margin-bottom: 18px; }
+            .intro { margin-bottom: 22px; }
+            .choice { grid-template-columns: 58px minmax(0, 1fr); gap: 14px; padding: 19px; }
+            .choice-icon { width: 56px; height: 56px; border-radius: 18px 18px 18px 8px; font-size: 1.7rem; }
+            .choice-action { grid-column: 2; justify-self: start; min-width: 0; margin-top: 3px; padding: 11px 16px; }
+            .stem.left { left: 1%; }
+            .stem.right { right: 1%; }
+            .tulip.left { left: calc(1% - 17px); }
+            .tulip.right { right: calc(1% - 17px); }
+        }
+        @media (max-width: 440px) {
+            body { padding: 18px 12px 28px; }
+            .page-shell { padding: 20px 15px 24px; }
+            h1 { font-size: 2rem; }
+            .intro p { font-size: 1.04rem; }
+            .choice { grid-template-columns: 1fr; gap: 11px; padding: 18px; }
+            .choice-icon { width: 52px; height: 52px; }
+            .choice h2 { font-size: 1.25rem; }
+            .choice-action { grid-column: 1; }
+            .supporting, .description { font-size: 0.98rem; }
+            .botanical-fg { opacity: 0.42; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="botanical-bg" aria-hidden="true">
+        <span class="glow one"></span><span class="glow two"></span><span class="glow three"></span>
+    </div>
+    <div class="botanical-fg" aria-hidden="true">
+        <span class="stem left"></span><span class="stem right"></span>
+        <span class="leaf left"></span><span class="leaf right"></span><span class="leaf top"></span>
+        <span class="tulip left"></span><span class="tulip right"></span>
+        <span class="daisy left"></span><span class="daisy right"></span>
+        <span class="wildflower one"></span><span class="wildflower two"></span>
+    </div>
+
+    <div class="progress" aria-label="Profile setup progress">
+        <div class="progress-step">01</div>
+        <div class="progress-step">02</div>
+        <div class="progress-step active" aria-current="step">03</div>
+    </div>
+
+    <main class="page-shell">
+        <div class="brand" aria-label="Presence brand">
+            <img src="presence-logo-cream.png" alt="" />
+            <span>Presence</span>
+        </div>
+        <section class="intro" aria-labelledby="page-title">
+            <h1 id="page-title">What would you like to do next?</h1>
+            <p>Tell us a little more about the Presence you’d like to have. You can personalize it now, or come back to these choices anytime.</p>
+        </section>
+
+        <nav class="choices" aria-label="Personalize your Presence">
+            <a class="choice name" href="presence-name.html">
+                <span class="choice-icon" aria-hidden="true">💬</span>
+                <div>
+                    <h2>Give your Presence a name</h2>
+                    <p class="description">Choose what you’d like to call your companion.</p>
+                    <p class="supporting">Pick a name that feels warm, familiar, or simply makes you smile.</p>
+                </div>
+                <span class="choice-action">Choose a name →</span>
+            </a>
+            <a class="choice avatar" href="presence-avatar.html">
+                <span class="choice-icon" aria-hidden="true">✨</span>
+                <div>
+                    <h2>Create your Presence’s avatar</h2>
+                    <p class="description">Give your Presence a look that feels right for you.</p>
+                    <p class="supporting">Choose an appearance, style, and little details that bring your Presence to life.</p>
+                </div>
+                <span class="choice-action">Build an avatar →</span>
+            </a>
+            <a class="choice personality" href="presence-personality.html">
+                <span class="choice-icon" aria-hidden="true">💛</span>
+                <div>
+                    <h2>Tell us about the Presence you want</h2>
+                    <p class="description">Help us understand the kind of companionship you’re looking for.</p>
+                    <p class="supporting">Tell us about the personality, energy, interests, and little things you’d like your Presence to have — we’ll use them to make your experience feel more personal.</p>
+                </div>
+                <span class="choice-action">Personalize my Presence →</span>
+            </a>
+        </nav>
+
+        <footer class="closing">
+            <p>You can do this now or come back later.</p>
+            <p>Your Presence will get to know you naturally over time.</p>
+            <a class="skip" href="home.html">Skip for now →</a>
+            <a class="finish-onboarding" href="home.html" id="finishOnboarding">
+                <span>All set ✨</span>
+                <span>Take me to my Presence →</span>
+            </a>
+        </footer>
+    </main>
+    <script>
+        document.querySelector('.skip').addEventListener('click', () => {
+            localStorage.removeItem('presenceProfile');
+            localStorage.removeItem('presencePersonalization');
+            localStorage.removeItem('presencePersonalizationComplete');
+        });
+        document.getElementById('finishOnboarding').addEventListener('click', () => {
+            let savedProfile = {};
+            try {
+                savedProfile = JSON.parse(localStorage.getItem('presenceProfile') || localStorage.getItem('presencePersonalization') || '{}');
+            } catch (error) {
+                savedProfile = {};
+            }
+            const profile = {};
+            if (savedProfile && typeof savedProfile === 'object' && !Array.isArray(savedProfile)) {
+                for (const field of ['name', 'personality']) {
+                    if (typeof savedProfile[field] === 'string' && savedProfile[field].trim()) profile[field] = savedProfile[field].trim();
+                }
+                if (['garden', 'sunrise', 'ocean'].includes(savedProfile.avatar)) profile.avatar = savedProfile.avatar;
+            }
+            if (Object.keys(profile).length) localStorage.setItem('presenceProfile', JSON.stringify(profile));
+            else localStorage.removeItem('presenceProfile');
+            localStorage.removeItem('presencePersonalization');
+            localStorage.setItem('presencePersonalizationComplete', 'true');
+        });
+    </script>
+</body>
+</html>

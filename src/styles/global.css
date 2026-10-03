@@ -1,0 +1,10 @@
+* { box-sizing: border-box; }
+html { min-height: 100%; scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
+body { min-width: 320px; min-height: 100vh; margin: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+button, input, textarea, select { font: inherit; }
+img { max-width: 100%; }
+.page-loading, .migration-error { padding: 3rem; color: var(--cream); }
+::-webkit-scrollbar { width: 18px; height: 18px; }
+::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, .12); }
+::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
+@media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }

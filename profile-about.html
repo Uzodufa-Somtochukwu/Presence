@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About you</title>
+    <style>
+        :root {
+            --ivory: #f7f1ea;
+            --ivory-soft: #eadfcf;
+            --wood: #7a5241;
+            --wood-deep: #583a30;
+            --clay: #c78067;
+            --sage: #aab99d;
+            --forest: #173a34;
+            --forest-soft: #244e48;
+            --rose: #d8b0b4;
+            --shadow: rgba(23, 18, 15, 0.14);
+            --surface: rgba(255, 255, 255, 0.42);
+            --line: rgba(122, 82, 65, 0.16);
+            --text: #1c2a29;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            margin: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, #f6efe8 0%, #f2e6d8 28%, #e8d9c8 58%, #d9c4b1 100%);
+            scrollbar-width: auto;
+            scrollbar-color: #4f403a #f4e9db;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 18px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f4e9db;
+            border-left: 1px solid rgba(122, 82, 65, 0.12);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #5d433b 0%, #3b2d27 100%);
+            border: 3px solid #f4e9db;
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4a352f 0%, #2d211d 100%);
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(180deg, #352721 0%, #241a16 100%);
+        }
+
+        @media (pointer: coarse) {
+            ::-webkit-scrollbar { width: initial; height: initial; }
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            width: 680px;
+            height: 680px;
+            border-radius: 50%;
+            filter: blur(42px);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        body::before {
+            left: -160px;
+            bottom: -180px;
+            background: radial-gradient(circle, rgba(170, 185, 157, 0.22), rgba(170, 185, 157, 0.02) 55%, transparent 72%);
+        }
+
+        body::after {
+            right: -150px;
+            top: -150px;
+            background: radial-gradient(circle, rgba(122, 82, 65, 0.12), rgba(122, 82, 65, 0.02) 55%, transparent 72%);
+        }
+
+        .page-shell {
+            width: min(100%, 900px);
+            background: rgba(255, 255, 255, 0.52);
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            box-shadow: 0 22px 60px rgba(66, 50, 41, 0.14);
+            backdrop-filter: blur(4px);
+            padding: 28px 28px 24px;
+            position: relative;
+            z-index: 1;
+            animation: pageFade 0.8s ease both;
+        }
+
+        .progress {
+            position: fixed;
+            left: 26px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 3;
+            color: rgba(28, 42, 41, 0.7);
+        }
+
+        .progress::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            width: 1px;
+            background: rgba(122, 82, 65, 0.18);
+            z-index: -1;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            background: rgba(122, 82, 65, 0.09);
+            border: 1px solid rgba(122, 82, 65, 0.18);
+            color: rgba(28, 42, 41, 0.8);
+        }
+
+        .progress-step.active {
+            background: linear-gradient(135deg, var(--wood) 0%, var(--clay) 100%);
+            color: var(--ivory);
+            border-color: rgba(122, 82, 65, 0.4);
+            box-shadow: 0 0 0 4px rgba(122, 82, 65, 0.08);
+        }
+
+        .botanical-bg,
+        .botanical-fg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .botanical-bg { opacity: 0.42; filter: blur(18px); }
+        .botanical-fg { opacity: 0.8; }
+
+        .botanical-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(170, 185, 157, 0.18);
+            filter: blur(4px);
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 120px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(119, 144, 111, 0.54), rgba(76, 118, 86, 0.28));
+            border-radius: 90% 0 90% 0 / 100% 0 100% 0;
+            transform: rotate(-28deg);
+            box-shadow: inset 0 0 18px rgba(255,255,255,0.08);
+        }
+
+        .stem {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, rgba(98, 120, 87, 0.72), rgba(122, 82, 65, 0.34));
+            border-radius: 2px;
+        }
+
+        .flower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(234, 202, 164, 0.9);
+            box-shadow: 0 0 0 4px rgba(216, 176, 180, 0.15), 0 0 0 8px rgba(170, 185, 157, 0.08);
+            animation: breathe 9s ease-in-out infinite;
+        }
+
+        .flower::before,
+        .flower::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 1px solid rgba(234, 204, 196, 0.5);
+            transform: rotate(35deg);
+        }
+
+        .flower.rose { background: rgba(198, 133, 144, 0.9); box-shadow: 0 0 0 4px rgba(216, 176, 180, 0.18), 0 0 0 8px rgba(170, 185, 157, 0.08); }
+        .flower.peach { background: rgba(224, 163, 117, 0.9); box-shadow: 0 0 0 4px rgba(238, 200, 166, 0.18), 0 0 0 8px rgba(170, 185, 157, 0.08); }
+        .flower.lavender { background: rgba(180, 167, 206, 0.88); box-shadow: 0 0 0 4px rgba(211, 196, 225, 0.16), 0 0 0 8px rgba(170, 185, 157, 0.08); }
+
+        @keyframes pageFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(16px, -10px, 0) scale(1.07); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: var(--forest);
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .content {
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .intro h1 {
+            margin: 0;
+            font-size: clamp(2.1rem, 4vw, 3.1rem);
+            line-height: 1.08;
+            letter-spacing: -0.06em;
+            font-weight: 500;
+            color: var(--forest);
+        }
+
+        .intro p {
+            margin: 12px auto 0;
+            max-width: 660px;
+            font-size: 1.04rem;
+            line-height: 1.6;
+            color: rgba(28, 42, 41, 0.78);
+        }
+
+        .textarea-panel,
+        .disclosure {
+            background: rgba(255, 255, 255, 0.34);
+            border: 1px solid rgba(122, 82, 65, 0.12);
+            border-radius: 24px;
+            padding: 20px 18px 18px;
+            box-shadow: 0 8px 24px rgba(78, 59, 46, 0.06);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 260px;
+            resize: vertical;
+            border: 1px solid rgba(122, 82, 65, 0.2);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.38);
+            padding: 18px 18px 16px;
+            color: var(--text);
+            font: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        textarea::placeholder {
+            color: rgba(28, 42, 41, 0.5);
+        }
+
+        textarea:focus {
+            border-color: rgba(122, 82, 65, 0.45);
+            box-shadow: 0 0 0 3px rgba(122, 82, 65, 0.08);
+        }
+
+        .skip {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 0.96rem;
+            color: rgba(28, 42, 41, 0.74);
+        }
+
+        .disclosure {
+            margin-top: 28px;
+        }
+
+        .disclosure h3 {
+            margin: 0 0 12px;
+            font-size: 1.05rem;
+            color: var(--forest);
+        }
+
+        .disclosure p {
+            margin: 0 0 14px;
+            font-size: 0.98rem;
+            line-height: 1.7;
+            color: rgba(28, 42, 41, 0.8);
+        }
+
+        .agreement {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+            padding-top: 10px;
+            color: var(--text);
+            font-size: 0.98rem;
+        }
+
+        .agreement input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--wood);
+        }
+
+        .next-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 280px;
+            margin: 26px auto 0;
+            padding: 15px 22px;
+            border: 1px solid rgba(122, 82, 65, 0.14);
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--forest) 0%, var(--forest-soft) 100%);
+            color: var(--ivory);
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 14px 28px rgba(28, 42, 41, 0.14);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .next-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 30px rgba(28, 42, 41, 0.2);
+        }
+
+        .error-note {
+            min-height: 18px;
+            margin-top: 8px;
+            color: #8a4d3d;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                padding: 22px 18px 20px;
+                border-radius: 22px;
+            }
+
+            .textarea-panel,
+            .disclosure {
+                padding: 16px 14px 14px;
+            }
+
+            .next-button {
+                max-width: 100%;
+            }
+
+            .progress {
+                position: sticky;
+                top: 12px;
+                left: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                gap: 10px;
+                margin: 0 auto 18px;
+                width: 100%;
+            }
+
+            .progress::before {
+                content: "";
+                position: absolute;
+                left: 18%;
+                right: 18%;
+                top: 50%;
+                height: 1px;
+                width: auto;
+                background: rgba(122, 82, 65, 0.18);
+                z-index: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="botanical-bg" aria-hidden="true">
+        <span class="botanical-shape" style="left: 3%; top: 18%; width: 260px; height: 150px; background: rgba(170, 185, 157, 0.18);"></span>
+        <span class="botanical-shape" style="right: 9%; top: 12%; width: 220px; height: 180px; background: rgba(122, 82, 65, 0.10);"></span>
+        <span class="leaf" style="left: 1%; bottom: 20%; transform: rotate(-36deg);"></span>
+        <span class="leaf" style="right: 4%; bottom: 18%; transform: rotate(24deg) scaleX(-1);"></span>
+        <span class="leaf" style="left: 24%; top: 12%; transform: rotate(24deg) scaleX(-1);"></span>
+    </div>
+    <div class="botanical-fg" aria-hidden="true">
+        <span class="stem" style="left: 9%; bottom: 0; height: 200px;"></span>
+        <span class="stem" style="right: 12%; bottom: 0; height: 170px;"></span>
+        <span class="flower peach" style="left: 8.5%; bottom: 180px;"></span>
+        <span class="flower rose" style="right: 11.5%; bottom: 150px;"></span>
+        <span class="leaf" style="left: 14%; bottom: 18%; width: 94px; height: 56px; transform: rotate(-18deg);"></span>
+        <span class="leaf" style="right: 16%; bottom: 20%; width: 114px; height: 60px; transform: rotate(16deg) scaleX(-1);"></span>
+    </div>
+
+    <div class="progress" aria-label="Profile setup progress">
+        <div class="progress-step">01</div>
+        <div class="progress-step">02</div>
+        <div class="progress-step active">03</div>
+    </div>
+
+    <div class="page-shell">
+        <div class="brand" aria-label="Presence brand">
+            <img src="presence-logo-cream.png" alt="Presence logo" />
+            <span>Presence</span>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h1>Tell us a little about yourself</h1>
+                <p>Share anything you'd like Presence to know about you. Your interests, your day, the people you love, things you're going through, things that make you happy — whatever feels comfortable.</p>
+            </div>
+
+            <div class="textarea-panel">
+                <textarea aria-label="About you" placeholder="Tell me whatever you'd like me to know..."></textarea>
+                <div class="skip">You can skip this. We'll get to know each other naturally.</div>
+            </div>
+
+            <div class="disclosure">
+                <h3>A little note from Presence</h3>
+                <p>Presence is an AI companion. I can listen, talk, laugh, remember things you share, and keep you company. But I'm not a real person, and I can sometimes make mistakes. I'm not a replacement for the people you love or for professional medical or mental-health care when you need it.</p>
+
+                <label class="agreement" for="consent">
+                    <input id="consent" type="checkbox" />
+                    <span>I understand and agree</span>
+                </label>
+                <div class="error-note" id="consentError" aria-live="polite"></div>
+            </div>
+
+            <a class="next-button" href="presence-personalize.html" id="enterPresenceBtn">Enter Presence →</a>
+        </div>
+    </div>
+
+    <script>
+        const enterButton = document.getElementById('enterPresenceBtn');
+        const consent = document.getElementById('consent');
+        const consentError = document.getElementById('consentError');
+
+        enterButton.addEventListener('click', function (event) {
+            if (!consent.checked) {
+                event.preventDefault();
+                consentError.textContent = 'Please confirm that you understand before continuing.';
+            } else {
+                consentError.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>

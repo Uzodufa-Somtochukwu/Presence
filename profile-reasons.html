@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What brings you here?</title>
+    <style>
+        :root {
+            --earth: #4d382f;
+            --earth-deep: #2d1f1b;
+            --clay: #b4664a;
+            --clay-soft: #d98967;
+            --caramel: #d8b784;
+            --cream: #f7f0e7;
+            --cream-soft: #ecdfd2;
+            --sage: #a9b795;
+            --forest: #173a34;
+            --forest-soft: #2a564d;
+            --shadow: rgba(28, 18, 14, 0.18);
+            --line: rgba(247, 240, 231, 0.18);
+            --surface: rgba(67, 48, 42, 0.68);
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            margin: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, var(--earth-deep) 0%, var(--earth) 28%, #6d4f43 50%, #8b5f4e 100%);
+            scrollbar-width: auto;
+            scrollbar-color: #2b4b46 #f5ead8;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 18px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f5ead8;
+            border-left: 1px solid rgba(77, 56, 47, 0.12);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #2d564f 0%, #1d3c38 100%);
+            border: 3px solid #f5ead8;
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #23463f 0%, #152f2d 100%);
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(180deg, #152f2d 0%, #102623 100%);
+        }
+
+        @media (pointer: coarse) {
+            ::-webkit-scrollbar { width: initial; height: initial; }
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            width: 680px;
+            height: 680px;
+            border-radius: 50%;
+            filter: blur(44px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        body::before {
+            left: -180px;
+            bottom: -180px;
+            background: radial-gradient(circle, rgba(217, 183, 132, 0.14), rgba(217, 183, 132, 0.02) 56%, transparent 72%);
+        }
+
+        body::after {
+            right: -160px;
+            top: -140px;
+            background: radial-gradient(circle, rgba(169, 183, 149, 0.14), rgba(169, 183, 149, 0.02) 56%, transparent 72%);
+        }
+
+        .page-shell {
+            width: min(100%, 860px);
+            background: rgba(79, 57, 49, 0.72);
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            box-shadow: 0 22px 60px rgba(22, 13, 10, 0.22);
+            backdrop-filter: blur(4px);
+            padding: 28px 28px 24px;
+            position: relative;
+            z-index: 1;
+            animation: pageFade 0.8s ease both;
+        }
+
+        .progress {
+            position: fixed;
+            left: 26px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 3;
+            color: rgba(247, 240, 231, 0.7);
+        }
+
+        .progress::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            width: 1px;
+            background: rgba(247, 240, 231, 0.2);
+            z-index: -1;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            background: rgba(247, 240, 231, 0.08);
+            border: 1px solid rgba(247, 240, 231, 0.14);
+            color: rgba(247, 240, 231, 0.8);
+        }
+
+        .progress-step.active {
+            background: linear-gradient(135deg, var(--clay) 0%, var(--caramel) 100%);
+            color: var(--earth-deep);
+            border-color: rgba(217, 183, 132, 0.8);
+            box-shadow: 0 0 0 4px rgba(217, 183, 132, 0.12);
+        }
+
+        .botanical-bg,
+        .botanical-fg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .botanical-bg { opacity: 0.42; filter: blur(20px); }
+        .botanical-fg { opacity: 0.74; }
+
+        .botanical-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(217, 183, 132, 0.18);
+            filter: blur(4px);
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 120px;
+            height: 74px;
+            background: linear-gradient(135deg, rgba(129, 154, 112, 0.5), rgba(86, 112, 72, 0.28));
+            border-radius: 90% 0 90% 0 / 100% 0 100% 0;
+            transform: rotate(-20deg);
+            box-shadow: inset 0 0 16px rgba(255,255,255,0.08);
+        }
+
+        .stem {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, rgba(95, 120, 86, 0.78), rgba(122, 82, 65, 0.38));
+            border-radius: 2px;
+        }
+
+        .flower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(244, 212, 132, 0.85);
+            box-shadow: 0 0 0 4px rgba(214, 153, 104, 0.18), 0 0 0 8px rgba(169,183,149,0.10);
+            animation: breathe 10s ease-in-out infinite;
+        }
+
+        .flower::before,
+        .flower::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 1px solid rgba(245, 214, 184, 0.52);
+            transform: rotate(34deg);
+        }
+
+        .flower.lavender { background: rgba(178, 163, 197, 0.9); box-shadow: 0 0 0 4px rgba(211, 196, 225, 0.16), 0 0 0 8px rgba(169,183,149,0.10); }
+        .flower.coral { background: rgba(201, 118, 100, 0.9); box-shadow: 0 0 0 4px rgba(226, 164, 145, 0.18), 0 0 0 8px rgba(97, 90, 82, 0.08); }
+        .flower.peach { background: rgba(224, 163, 117, 0.9); box-shadow: 0 0 0 4px rgba(241, 195, 157, 0.18), 0 0 0 8px rgba(169,183,149,0.10); }
+
+        @keyframes pageFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(18px, -12px, 0) scale(1.09); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: var(--cream);
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .content {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .intro h1 {
+            margin: 0;
+            font-size: clamp(2.1rem, 4vw, 3.1rem);
+            line-height: 1.08;
+            letter-spacing: -0.06em;
+            font-weight: 500;
+            color: var(--cream);
+        }
+
+        .intro p {
+            margin: 12px auto 0;
+            max-width: 560px;
+            font-size: 1.04rem;
+            line-height: 1.6;
+            color: rgba(247, 240, 231, 0.82);
+        }
+
+        .reason-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(247, 240, 231, 0.12);
+            border-radius: 24px;
+            padding: 20px 18px 18px;
+            margin-bottom: 22px;
+        }
+
+        .reason-section h2 {
+            margin: 0 0 16px;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            color: var(--cream);
+            font-weight: 600;
+        }
+
+        .option-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-row {
+            position: relative;
+        }
+
+        .option-row input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 48px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(247, 240, 231, 0.14);
+            background: rgba(247, 240, 231, 0.03);
+            color: var(--cream);
+            cursor: pointer;
+            transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
+        }
+
+        .option-label:hover {
+            transform: translateY(-1px);
+            border-color: rgba(217, 183, 132, 0.5);
+        }
+
+        .check-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(247, 240, 231, 0.7);
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .option-row input:checked + .option-label {
+            border-color: rgba(217, 183, 132, 0.8);
+            background: rgba(217, 183, 132, 0.08);
+        }
+
+        .option-row input:checked + .option-label .check-dot {
+            border-color: rgba(247, 240, 231, 0.9);
+            background: rgba(247, 240, 231, 0.9);
+            box-shadow: inset 0 0 0 4px rgba(77, 56, 47, 0.9);
+        }
+
+        .next-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 260px;
+            margin: 10px auto 0;
+            padding: 15px 22px;
+            border-radius: 999px;
+            border: 1px solid rgba(247, 240, 231, 0.18);
+            background: linear-gradient(135deg, var(--cream) 0%, #efe3d4 100%);
+            color: var(--earth-deep);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            box-shadow: 0 14px 28px rgba(20, 12, 9, 0.2);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .next-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 30px rgba(20, 12, 9, 0.26);
+        }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                padding: 22px 18px 20px;
+                border-radius: 22px;
+            }
+
+            .reason-section {
+                padding: 16px 14px 14px;
+            }
+
+            .next-button {
+                max-width: 100%;
+            }
+
+            .progress {
+                position: sticky;
+                top: 12px;
+                left: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                gap: 10px;
+                margin: 0 auto 18px;
+                width: 100%;
+            }
+
+            .progress::before {
+                content: "";
+                position: absolute;
+                left: 18%;
+                right: 18%;
+                top: 50%;
+                height: 1px;
+                width: auto;
+                background: rgba(247, 240, 231, 0.2);
+                z-index: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="botanical-bg" aria-hidden="true">
+        <span class="botanical-shape" style="left: 6%; top: 18%; width: 260px; height: 150px; background: rgba(217, 183, 132, 0.16);"></span>
+        <span class="botanical-shape" style="right: 8%; top: 14%; width: 220px; height: 180px; background: rgba(180, 102, 74, 0.12);"></span>
+        <span class="leaf" style="left: 0%; bottom: 15%; transform: rotate(-30deg);"></span>
+        <span class="leaf" style="right: 4%; bottom: 12%; transform: rotate(22deg) scaleX(-1);"></span>
+        <span class="leaf" style="left: 20%; top: 10%; transform: rotate(28deg) scaleX(-1);"></span>
+    </div>
+    <div class="botanical-fg" aria-hidden="true">
+        <span class="stem" style="left: 11%; bottom: 0; height: 210px;"></span>
+        <span class="stem" style="right: 14%; bottom: 0; height: 180px;"></span>
+        <span class="flower peach" style="left: 10.5%; bottom: 190px;"></span>
+        <span class="flower lavender" style="right: 13.5%; bottom: 160px;"></span>
+        <span class="leaf" style="left: 16%; bottom: 20%; width: 110px; height: 58px; transform: rotate(-18deg);"></span>
+        <span class="leaf" style="right: 18%; bottom: 22%; width: 118px; height: 62px; transform: rotate(18deg) scaleX(-1);"></span>
+    </div>
+
+    <div class="progress" aria-label="Profile setup progress">
+        <div class="progress-step">01</div>
+        <div class="progress-step active">02</div>
+        <div class="progress-step">03</div>
+    </div>
+
+    <div class="page-shell">
+        <div class="brand" aria-label="Presence brand">
+            <img src="presence-logo-cream.png" alt="Presence logo" />
+            <span>Presence</span>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h1>What brings you here?</h1>
+                <p>Choose whatever feels right. There are no wrong answers.</p>
+            </div>
+
+            <div class="reason-section">
+                <h2>What brings you to Presence?</h2>
+                <div class="option-grid">
+                    <div class="option-row">
+                        <input id="reason-1" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-1">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I want someone to talk to</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-2" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-2">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I spend a lot of time alone</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-3" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-3">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I work from home</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-4" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-4">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I miss someone</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-5" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-5">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I want a friend</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-6" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-6">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I want someone to listen</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-7" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-7">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I want encouragement</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-8" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-8">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>I want someone to laugh and gist with</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="reason-9" type="checkbox" name="reasons" />
+                        <label class="option-label" for="reason-9">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Something else</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reason-section">
+                <h2>What kind of presence are you looking for?</h2>
+                <div class="option-grid">
+                    <div class="option-row">
+                        <input id="presence-1" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-1">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>A friend</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-2" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-2">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Someone to listen</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-3" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-3">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Someone to talk things through with</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-4" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-4">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Someone to make me laugh</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-5" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-5">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Someone to encourage me</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-6" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-6">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>Someone to check in on me</span>
+                        </label>
+                    </div>
+                    <div class="option-row">
+                        <input id="presence-7" type="checkbox" name="presence" />
+                        <label class="option-label" for="presence-7">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span>A little bit of everything</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <a class="next-button" href="profile-about.html">Next →</a>
+        </div>
+    </div>
+</body>
+</html>
