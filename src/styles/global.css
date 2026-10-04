@@ -1,10 +1,111 @@
-* { box-sizing: border-box; }
-html { min-height: 100%; scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
-body { min-width: 320px; min-height: 100vh; margin: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
-button, input, textarea, select { font: inherit; }
-img { max-width: 100%; }
-.page-loading, .migration-error { padding: 3rem; color: var(--cream); }
-::-webkit-scrollbar { width: 18px; height: 18px; }
-::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, .12); }
-::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
-@media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --forest: #173a34;
+    --forest-deep: #0e221f;
+    --forest-soft: #245248;
+    --cream: #f6eee3;
+    --cream-soft: #fbf5ed;
+    --paper: #fffaf3;
+    --paper-deep: #eee2d2;
+    --text: #263632;
+    --muted: #5d6761;
+    --wood: #705142;
+    --clay: #b96851;
+    --clay-soft: #d5836d;
+    --sage: #a8b698;
+    --sage-soft: #d8e2cf;
+    --rose: #d9b5b1;
+    --lavender: #d7cde0;
+    --caramel: #e4c887;
+    --line: rgba(80, 62, 47, 0.12);
+  }
+
+  .dark {
+    --forest: #122823;
+    --forest-deep: #091714;
+    --forest-soft: #1d3e37;
+    --cream: #14221f;
+    --cream-soft: #1a2a26;
+    --paper: #1c2e2a;
+    --paper-deep: #253b36;
+    --text: #f4eee5;
+    --muted: #a3b2ab;
+    --wood: #a87e6b;
+    --clay: #d68772;
+    --clay-soft: #e2a08f;
+    --sage: #95a684;
+    --sage-soft: #42554b;
+    --rose: #ba8c95;
+    --lavender: #9b8da9;
+    --caramel: #d8b76c;
+    --line: rgba(244, 238, 229, 0.14);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text);
+    background-color: var(--cream);
+    overflow-x: hidden;
+  }
+}
+
+/* Custom serene keyframe animations */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes gentleDrift {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.05);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.animate-gentle-drift {
+  animation: gentleDrift 10s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 6s ease-in-out infinite;
+}

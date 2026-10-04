@@ -1,7 +1,0 @@
-.landing-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; color: var(--cream); background: linear-gradient(135deg, var(--teal-900), var(--teal-800) 24%, var(--teal-700) 48%, var(--forest-olive)); }
-.landing-page > img { width: min(40vw, 230px); height: auto; border-radius: 50%; }
-.landing-page h1 { margin: 1rem 0 .5rem; font-size: clamp(2.5rem, 7vw, 5rem); }
-.landing-page p { max-width: 34rem; color: var(--cream-soft); font-size: 1.2rem; }
-.landing-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 1rem; }
-.landing-actions a { padding: .9rem 1.5rem; border: 1px solid var(--cream-soft); border-radius: 999px; color: var(--cream); text-decoration: none; }
-.landing-actions a:first-child { color: var(--teal-900); background: var(--cream); }
