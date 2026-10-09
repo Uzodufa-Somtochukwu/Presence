@@ -5,15 +5,33 @@ import CompanionAvatarView from '../../components/common/CompanionAvatarView.jsx
 import ChatDrawer from '../../components/home/ChatDrawer.jsx';
 import BreathingModal from '../../components/home/BreathingModal.jsx';
 import CheckInModal from '../../components/home/CheckInModal.jsx';
+import PresencePointsModal from '../../components/home/PresencePointsModal.jsx';
+import VoiceTalkModal from '../../components/home/VoiceTalkModal.jsx';
+import WalletConnection from '../../components/wallet/WalletConnection.jsx';
+import { readAppSettings } from '../../utils/storage.js';
+import {
+  addPointsHistory,
+  getLocalDateKey,
+  getPresencePoints,
+} from '../../utils/points.js';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { presence, settings, toggleTheme, toggleLargeText, showToast } = usePresence();
+  const {
+    presence,
+    settings,
+    updateSettings,
+    toggleTheme,
+    toggleLargeText,
+    showToast,
+  } = usePresence();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [breathingOpen, setBreathingOpen] = useState(false);
   const [checkInOpen, setCheckInOpen] = useState(false);
+  const [pointsOpen, setPointsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -29,13 +47,13 @@ export default function Home() {
   const navItems = [
     { id: 'home', label: 'Home', icon: '⌂' },
     { id: 'chat', label: 'Chat', icon: '▱', action: () => setChatOpen(true) },
-    { id: 'talk', label: 'Talk', icon: '🎙️', action: () => showToast('Voice conversation mode is ready to listen.') },
+    { id: 'talk', label: 'Talk', icon: '🎙️', action: () => setVoiceOpen(true) },
     { id: 'memories', label: 'Memories', icon: '✿', action: () => showToast('Your memories are softly organized here.') },
     { id: 'people', label: 'People in my life', icon: '♧', action: () => showToast('Your loved ones and personal circle notes.') },
     { id: 'activities', label: 'Activities', icon: '✧', action: () => setBreathingOpen(true) },
     { id: 'stories', label: 'My Stories', icon: '▤', action: () => showToast('Saved journal stories & daily thoughts.') },
     { id: 'check-ins', label: 'Check-ins', icon: '♡', action: () => setCheckInOpen(true) },
-    { id: 'points', label: 'Presence Points', icon: '◈', action: () => showToast(`You have ${settings.points || 1240} Presence Points. Keep glowing!`) },
+    { id: 'points', label: 'Presence Points', icon: '◈', action: () => setPointsOpen(true) },
     { id: 'settings', label: 'Settings', icon: '⚙', action: () => navigate('/presence/personalize') },
   ];
 
@@ -43,6 +61,25 @@ export default function Home() {
     setChatOpen(true);
     showToast(`Starting chat: "${prompt}"`);
   };
+
+  const handleBreathingComplete = () => {
+    const currentSettings = readAppSettings();
+    const today = getLocalDateKey();
+
+    if (currentSettings.dailyActivityDate === today) {
+      showToast('You’ve earned today’s activity points. Come back tomorrow.');
+      return;
+    }
+
+    updateSettings({
+      points: getPresencePoints(currentSettings) + 5,
+      pointsHistory: addPointsHistory(currentSettings, 'Breathing pause', 5),
+      dailyActivityDate: today,
+    });
+    showToast('You completed a breathing pause. +5 Presence Points.');
+  };
+
+  // TODO: use a reliable daily streak ledger before awarding 7-day bonuses.
 
   return (
     <div className="min-h-screen bg-[#f6eee3] dark:bg-[#14221f] text-[#263632] dark:text-[#f4eee5] flex flex-col md:flex-row transition-colors duration-300">
@@ -113,6 +150,8 @@ export default function Home() {
 
         {/* Utility / Footer in sidebar */}
         <div className="pt-4 border-t border-white/15 space-y-2 text-xs">
+          <WalletConnection />
+
           <button
             type="button"
             onClick={toggleTheme}
@@ -168,11 +207,12 @@ export default function Home() {
               {/* Points Badge */}
               <button
                 type="button"
-                onClick={() => showToast(`🪙 ${(settings.points || 1240).toLocaleString()} Presence Points.`)}
+                onClick={() => setPointsOpen(true)}
+                aria-label="View Unlocks and your Presence Points"
                 className="py-1.5 px-3.5 rounded-full border border-black/10 dark:border-white/15 bg-white/80 dark:bg-white/10 text-xs font-semibold flex items-center gap-1.5 hover:bg-white transition-all cursor-pointer shadow-xs"
               >
                 <span>🪙</span>
-                <span className="tabular-nums">{(settings.points || 1240).toLocaleString()}</span>
+                <span className="tabular-nums">{getPresencePoints(settings).toLocaleString()}</span>
               </button>
 
               {/* Notification Popover */}
@@ -330,7 +370,7 @@ export default function Home() {
             {/* Talk Action */}
             <button
               type="button"
-              onClick={() => showToast('Voice conversations are available on request.')}
+              onClick={() => setVoiceOpen(true)}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#c47b60] to-[#a75f4c] text-[#fffaf2] border border-white/20 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 text-left flex items-center justify-between gap-4 cursor-pointer group"
             >
               <div className="flex items-center gap-4">
@@ -444,15 +484,32 @@ export default function Home() {
         userName={presence.userName || 'Somto'}
       />
 
+      <VoiceTalkModal
+        isOpen={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        companion={presence}
+        userName={presence.userName || 'Somto'}
+      />
+
       <BreathingModal
         isOpen={breathingOpen}
         onClose={() => setBreathingOpen(false)}
+        onComplete={handleBreathingComplete}
         companionName={presence.displayName}
       />
 
       <CheckInModal
         isOpen={checkInOpen}
         onClose={() => setCheckInOpen(false)}
+      />
+
+      <PresencePointsModal
+        isOpen={pointsOpen}
+        onClose={() => setPointsOpen(false)}
+        onTryIt={() => {
+          setPointsOpen(false);
+          setVoiceOpen(true);
+        }}
       />
     </div>
   );

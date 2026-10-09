@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 
-export default function BreathingModal({ isOpen, onClose, companionName = 'Lumi' }) {
+export default function BreathingModal({
+  isOpen,
+  onClose,
+  onComplete,
+  companionName = 'Lumi',
+}) {
   const [phase, setPhase] = useState('Inhale');
   const [seconds, setSeconds] = useState(4);
   const [cycleCount, setCycleCount] = useState(1);
@@ -18,6 +23,7 @@ export default function BreathingModal({ isOpen, onClose, companionName = 'Lumi'
     let currentIdx = 0;
     setPhase(phases[0].name);
     setSeconds(phases[0].duration);
+    setCycleCount(1);
 
     const interval = setInterval(() => {
       setSeconds((prev) => {
@@ -100,9 +106,16 @@ export default function BreathingModal({ isOpen, onClose, companionName = 'Lumi'
           Cycle {cycleCount} · Release any tension in your jaw and shoulders
         </p>
 
+        <p className="mt-2 text-xs text-white/60">
+          Complete one full cycle to earn today’s +5 Presence Points.
+        </p>
+
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            if (cycleCount > 1) onComplete?.();
+            onClose();
+          }}
           className="mt-8 py-3 px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-sm font-semibold text-white transition-all cursor-pointer"
         >
           I feel grounded now

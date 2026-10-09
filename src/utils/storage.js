@@ -112,7 +112,7 @@ export function readAppSettings() {
     theme: 'light',
     largeText: false,
     streak: 7,
-    points: 1240,
+    points: 0,
   };
 }
 
