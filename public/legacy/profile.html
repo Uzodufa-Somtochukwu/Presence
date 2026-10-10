@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Setup</title>
+    <style>
+        :root {
+            --forest: #102d2b;
+            --forest-deep: #0e1f1d;
+            --green-soft: #163f39;
+            --teal: #234e49;
+            --wood-brown: #7a5241;
+            --wood-brown-soft: #b17b62;
+            --terracotta: #c77c61;
+            --caramel: #d9b483;
+            --cream: #f6efe8;
+            --cream-soft: #efe3d3;
+            --sage: #b4c1a6;
+            --moss: #7e8f70;
+            --rose: #d8b4b8;
+            --shadow: rgba(12, 20, 18, 0.18);
+            --line: rgba(246, 239, 232, 0.16);
+            --surface: rgba(18, 41, 37, 0.78);
+            --surface-strong: rgba(23, 44, 40, 0.82);
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            margin: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 28%, var(--green-soft) 62%, #29443f 100%);
+            scrollbar-width: auto;
+            scrollbar-color: #204843 #f1e6d9;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 18px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1e6d9;
+            border-left: 1px solid rgba(16, 45, 43, 0.12);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #214d49 0%, #183b38 100%);
+            border: 3px solid #f1e6d9;
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #173d3a 0%, #102b2a 100%);
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(180deg, #102b2a 0%, #0b211f 100%);
+        }
+
+        @media (pointer: coarse) {
+            ::-webkit-scrollbar { width: initial; height: initial; }
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            width: 620px;
+            height: 620px;
+            border-radius: 50%;
+            filter: blur(40px);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        body::before {
+            left: -120px;
+            bottom: -150px;
+            background: radial-gradient(circle, rgba(180, 193, 166, 0.18), rgba(180, 193, 166, 0.02) 56%, transparent 72%);
+        }
+
+        body::after {
+            right: -160px;
+            top: -140px;
+            background: radial-gradient(circle, rgba(217, 180, 131, 0.10), rgba(217, 180, 131, 0.02) 56%, transparent 72%);
+        }
+
+        .page-shell {
+            width: min(100%, 820px);
+            background: rgba(19, 39, 35, 0.74);
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            box-shadow: 0 22px 60px rgba(5, 12, 12, 0.24);
+            backdrop-filter: blur(4px);
+            padding: 28px 28px 24px;
+            position: relative;
+            z-index: 1;
+            animation: pageFade 0.8s ease both;
+        }
+
+        .progress {
+            position: fixed;
+            left: 26px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 3;
+            color: rgba(246, 239, 232, 0.7);
+        }
+
+        .progress::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            width: 1px;
+            background: rgba(246, 239, 232, 0.2);
+            z-index: -1;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            background: rgba(246, 239, 232, 0.08);
+            border: 1px solid rgba(246, 239, 232, 0.16);
+            color: rgba(246, 239, 232, 0.8);
+        }
+
+        .progress-step.active {
+            background: linear-gradient(135deg, var(--caramel) 0%, var(--terracotta) 100%);
+            color: var(--forest-deep);
+            border-color: rgba(217, 180, 131, 0.8);
+            box-shadow: 0 0 0 4px rgba(217, 180, 131, 0.12);
+        }
+
+        .progress-step.complete {
+            background: rgba(180, 193, 166, 0.18);
+            border-color: rgba(180, 193, 166, 0.4);
+            color: var(--cream);
+        }
+
+        .botanical-bg,
+        .botanical-fg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .botanical-bg { opacity: 0.38; filter: blur(18px); }
+        .botanical-fg { opacity: 0.7; }
+
+        .botanical-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(180, 193, 166, 0.18);
+            filter: blur(4px);
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 110px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(104, 140, 101, 0.48), rgba(43, 83, 56, 0.26));
+            border-radius: 90% 0 90% 0 / 100% 0 100% 0;
+            transform: rotate(-28deg);
+            box-shadow: inset 0 0 18px rgba(255,255,255,0.08);
+        }
+
+        .stem {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, rgba(98, 123, 92, 0.72), rgba(118, 94, 72, 0.36));
+            border-radius: 2px;
+        }
+
+        .flower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(230, 186, 93, 0.9);
+            box-shadow: 0 0 0 4px rgba(247, 220, 177, 0.22), 0 0 0 8px rgba(197, 144, 131, 0.12);
+            animation: breathe 9s ease-in-out infinite;
+        }
+
+        .flower::before,
+        .flower::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 1px solid rgba(244, 211, 191, 0.5);
+            transform: rotate(35deg);
+        }
+
+        .flower.pink { background: rgba(204, 135, 153, 0.9); box-shadow: 0 0 0 4px rgba(220, 164, 180, 0.20), 0 0 0 8px rgba(180, 102, 74, 0.10); }
+        .flower.peach { background: rgba(224, 163, 117, 0.92); box-shadow: 0 0 0 4px rgba(240, 196, 162, 0.20), 0 0 0 8px rgba(180, 102, 74, 0.10); }
+        .flower.lavender { background: rgba(181, 164, 203, 0.9); box-shadow: 0 0 0 4px rgba(206, 194, 225, 0.20), 0 0 0 8px rgba(122, 82, 65, 0.08); }
+        .flower.coral { background: rgba(200, 108, 89, 0.88); box-shadow: 0 0 0 4px rgba(228, 166, 150, 0.18), 0 0 0 8px rgba(180, 102, 74, 0.10); }
+
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(20px, -12px, 0) scale(1.07); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        @keyframes pageFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: var(--cream);
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .content {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .intro h1 {
+            margin: 0;
+            font-size: clamp(2.1rem, 4vw, 3.2rem);
+            line-height: 1.06;
+            letter-spacing: -0.06em;
+            font-weight: 500;
+            color: var(--cream);
+        }
+
+        .intro p {
+            margin: 12px auto 0;
+            max-width: 600px;
+            font-size: 1.04rem;
+            line-height: 1.6;
+            color: rgba(246, 239, 232, 0.82);
+        }
+
+        .questions {
+            display: grid;
+            gap: 22px;
+        }
+
+        .question {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(246, 239, 232, 0.12);
+            border-radius: 22px;
+            padding: 20px 18px 18px;
+        }
+
+        .question h2 {
+            margin: 0 0 14px;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            color: var(--cream);
+            font-weight: 600;
+        }
+
+        .input-wrap {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field {
+            width: 100%;
+            background: rgba(246, 239, 232, 0.05);
+            border: 1px solid rgba(246, 239, 232, 0.18);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: var(--cream);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .field::placeholder {
+            color: rgba(246, 239, 232, 0.52);
+        }
+
+        .field:focus {
+            border-color: rgba(246, 239, 232, 0.38);
+            box-shadow: 0 0 0 3px rgba(246, 239, 232, 0.08);
+        }
+
+        .option-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-row {
+            position: relative;
+        }
+
+        .option-row input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 48px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(246, 239, 232, 0.14);
+            background: rgba(246, 239, 232, 0.03);
+            color: var(--cream);
+            cursor: pointer;
+            transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
+        }
+
+        .option-label:hover {
+            transform: translateY(-1px);
+            border-color: rgba(217, 180, 131, 0.4);
+        }
+
+        .radio-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(246, 239, 232, 0.65);
+            background: transparent;
+            position: relative;
+            flex-shrink: 0;
+            transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .option-row input:checked + .option-label {
+            border-color: rgba(217, 180, 131, 0.8);
+            background: rgba(217, 180, 131, 0.08);
+        }
+
+        .option-row input:checked + .option-label .radio-dot {
+            border-color: rgba(246, 239, 232, 0.9);
+            background: rgba(246, 239, 232, 0.9);
+            box-shadow: inset 0 0 0 4px rgba(16, 45, 43, 0.8);
+        }
+
+        .next-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 260px;
+            margin: 26px auto 0;
+            padding: 15px 22px;
+            border-radius: 999px;
+            border: 1px solid rgba(246, 239, 232, 0.18);
+            background: linear-gradient(135deg, var(--cream) 0%, #efe4d2 100%);
+            color: var(--forest-deep);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            box-shadow: 0 14px 28px rgba(10, 18, 17, 0.18);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .next-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 30px rgba(10, 18, 17, 0.24);
+        }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                padding: 22px 18px 20px;
+                border-radius: 22px;
+            }
+
+            .question {
+                padding: 16px 14px 14px;
+            }
+
+            .next-button {
+                max-width: 100%;
+            }
+
+            .progress {
+                position: sticky;
+                top: 12px;
+                left: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                gap: 10px;
+                margin: 0 auto 18px;
+                width: 100%;
+            }
+
+            .progress::before {
+                content: "";
+                position: absolute;
+                left: 18%;
+                right: 18%;
+                top: 50%;
+                height: 1px;
+                width: auto;
+                background: rgba(246, 239, 232, 0.2);
+                z-index: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="botanical-bg" aria-hidden="true">
+        <span class="botanical-shape" style="left: 4%; top: 12%; width: 260px; height: 170px; background: rgba(180, 193, 166, 0.16);"></span>
+        <span class="botanical-shape" style="right: 6%; top: 18%; width: 220px; height: 180px; background: rgba(217, 180, 131, 0.12);"></span>
+        <span class="leaf" style="left: 0%; bottom: 16%; transform: rotate(-34deg);"></span>
+        <span class="leaf" style="right: 3%; bottom: 14%; transform: rotate(26deg) scaleX(-1);"></span>
+        <span class="leaf" style="left: 18%; top: 16%; transform: rotate(24deg) scaleX(-1);"></span>
+    </div>
+    <div class="botanical-fg" aria-hidden="true">
+        <span class="stem" style="left: 9%; bottom: 0; height: 220px;"></span>
+        <span class="stem" style="right: 12%; bottom: 0; height: 180px;"></span>
+        <span class="flower peach" style="left: 8.5%; bottom: 200px;"></span>
+        <span class="flower pink" style="right: 11.5%; bottom: 160px;"></span>
+        <span class="leaf" style="left: 12%; bottom: 18%; width: 96px; height: 58px; transform: rotate(-16deg);"></span>
+        <span class="leaf" style="right: 16%; bottom: 20%; width: 116px; height: 64px; transform: rotate(16deg) scaleX(-1);"></span>
+    </div>
+
+    <div class="progress" aria-label="Profile setup progress">
+        <div class="progress-step active">01</div>
+        <div class="progress-step">02</div>
+        <div class="progress-step">03</div>
+    </div>
+
+    <div class="page-shell">
+        <div class="brand" aria-label="Presence brand">
+            <img src="presence-logo-cream.png" alt="Presence logo" />
+            <span>Presence</span>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h1>Let's get to know you</h1>
+                <p>Just a few things to help Presence feel a little more like home.</p>
+            </div>
+
+            <div class="questions">
+                <div class="question">
+                    <h2>What should we call you?</h2>
+                    <div class="input-wrap">
+                        <input class="field" type="text" placeholder="Your name or username" aria-label="Your name or username" />
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h2>What age group are you in?</h2>
+                    <div class="option-grid" role="radiogroup" aria-label="Age group">
+                        <div class="option-row">
+                            <input id="age-18-24" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-18-24">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>18–24</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="age-25-34" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-25-34">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>25–34</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="age-35-44" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-35-44">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>35–44</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="age-45-54" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-45-54">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>45–54</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="age-55-64" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-55-64">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>55–64</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="age-65" type="radio" name="ageGroup" />
+                            <label class="option-label" for="age-65">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>65+</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h2>How should Presence refer to you?</h2>
+                    <div class="option-grid" role="radiogroup" aria-label="Pronouns">
+                        <div class="option-row">
+                            <input id="pronoun-she" type="radio" name="pronouns" />
+                            <label class="option-label" for="pronoun-she">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>She / Her</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="pronoun-he" type="radio" name="pronouns" />
+                            <label class="option-label" for="pronoun-he">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>He / Him</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="pronoun-they" type="radio" name="pronouns" />
+                            <label class="option-label" for="pronoun-they">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>They / Them</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="pronoun-prefer-not" type="radio" name="pronouns" />
+                            <label class="option-label" for="pronoun-prefer-not">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>Prefer not to say</span>
+                            </label>
+                        </div>
+                        <div class="option-row">
+                            <input id="pronoun-other" type="radio" name="pronouns" />
+                            <label class="option-label" for="pronoun-other">
+                                <span class="radio-dot" aria-hidden="true"></span>
+                                <span>Other</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a class="next-button" href="profile-reasons.html">Next →</a>
+        </div>
+    </div>
+</body>
+</html>

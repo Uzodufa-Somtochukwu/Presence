@@ -1,0 +1,16 @@
+:root {
+  --teal-900: #0e1c1a;
+  --teal-800: #122d29;
+  --teal-700: #173a34;
+  --teal-600: #1f4d45;
+  --teal-500: #2c655d;
+  --forest-olive: #243f39;
+  --wood-brown: #7a5241;
+  --wood-brown-deep: #5f3d34;
+  --cream: #f5efe6;
+  --cream-soft: #e8dcc2;
+  --sage: #b9c9af;
+  --sage-soft: #dfe8d6;
+  --shadow: rgba(8, 11, 10, 0.18);
+  --shadow-strong: rgba(8, 11, 10, 0.28);
+}

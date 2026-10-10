@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personalize your Presence | Presence</title>
+    <style>
+        html { scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
+        ::-webkit-scrollbar { width: 18px; height: 18px; }
+        ::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, 0.12); }
+        ::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #244a41; }
+        ::-webkit-scrollbar-thumb:active { background: #1c3c35; }
+        @media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }
+
+        body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(135deg, #f7f1e9, #e8d8c8); color: #263633; font-family: "Segoe UI", Tahoma, sans-serif; }
+        main { width: min(100%, 620px); padding: 42px 32px; border: 1px solid rgba(122,82,65,.18); border-radius: 24px; background: rgba(255,250,243,.9); box-shadow: 0 20px 55px rgba(70,48,36,.14); text-align: center; }
+        h1 { margin: 0; color: #173a34; font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 550; }
+        p { margin: 16px 0 26px; font-size: 1.1rem; line-height: 1.6; }
+        a { display: inline-block; padding: 13px 20px; border-radius: 999px; background: #173a34; color: #fffaf2; font-size: 1rem; font-weight: 700; text-decoration: none; }
+        a:focus-visible { outline: 4px solid #b96f58; outline-offset: 4px; }
+        label { display: block; margin-bottom: 8px; color: #173a34; font-weight: 650; text-align: left; }
+        textarea { width: 100%; min-height: 130px; margin-bottom: 18px; padding: 12px 13px; border: 1px solid rgba(122,82,65,.28); border-radius: 12px; color: #263633; background: #fffdf8; font: inherit; line-height: 1.5; resize: vertical; }
+        textarea:focus-visible { outline: 3px solid #b96f58; outline-offset: 2px; }
+        button { padding: 13px 20px; border: 0; border-radius: 999px; color: #fffaf2; background: #173a34; font: inherit; font-weight: 700; cursor: pointer; }
+        button:focus-visible { outline: 4px solid #b96f58; outline-offset: 4px; }
+        .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .actions a { background: #eee3d4; color: #173a34; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Personalize your Presence</h1>
+        <p>Share a little about the kind of companionship you’d enjoy.</p>
+        <form id="personalityForm">
+            <label for="presencePersonality">Personality, energy, and interests</label>
+            <textarea id="presencePersonality" name="personality" maxlength="500" placeholder="For example, warm, curious, and happy to talk about books or music."></textarea>
+            <div class="actions"><button type="submit">Save details</button><a href="presence-personalize.html">Back to your choices</a></div>
+        </form>
+    </main>
+    <script>
+        const storageKey = 'presenceProfile';
+        const oldStorageKey = 'presencePersonalization';
+        function readProfile() {
+            try {
+                const value = JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem(oldStorageKey) || '{}');
+                return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+            } catch (error) { return {}; }
+        }
+        const personalization = readProfile();
+        const personalityInput = document.getElementById('presencePersonality');
+        personalityInput.value = personalization.personality || '';
+        function savePersonality() {
+            const data = readProfile();
+            const personality = personalityInput.value.trim();
+            if (personality) data.personality = personality;
+            else delete data.personality;
+            if (Object.keys(data).length) localStorage.setItem(storageKey, JSON.stringify(data));
+            else localStorage.removeItem(storageKey);
+            localStorage.removeItem(oldStorageKey);
+        }
+        personalityInput.addEventListener('input', savePersonality);
+        document.getElementById('personalityForm').addEventListener('submit', event => {
+            event.preventDefault();
+            savePersonality();
+            window.location.href = 'presence-personalize.html';
+        });
+    </script>
+</body>
+</html>

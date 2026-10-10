@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5eee4" />
+    <title>Create your Presence avatar | Presence</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --forest: #173a34;
+            --forest-deep: #102d2a;
+            --cream: #f5eee4;
+            --paper: #fffaf2;
+            --text: #263633;
+            --muted: #59635c;
+            --wood: #705142;
+            --clay: #b96851;
+            --sage: #a8b698;
+            --line: rgba(80, 62, 47, 0.16);
+            --shadow: 0 16px 38px rgba(65, 47, 35, 0.12);
+        }
+        * { box-sizing: border-box; }
+        html { min-height: 100%; background: var(--cream); scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
+        ::-webkit-scrollbar { width: 18px; height: 18px; }
+        ::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, 0.12); }
+        ::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #244a41; }
+        ::-webkit-scrollbar-thumb:active { background: #1c3c35; }
+        @media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }
+        body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 38px 24px; color: var(--text); background: radial-gradient(ellipse at 10% 9%, rgba(168,182,152,.24), transparent 25rem), radial-gradient(ellipse at 92% 92%, rgba(185,104,81,.14), transparent 28rem), linear-gradient(135deg, #f7f1e9, #e8d8c8); font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+        .progress { position: fixed; left: 26px; top: 50%; z-index: 2; display: grid; gap: 23px; transform: translateY(-50%); }
+        .progress::before { content: ""; position: absolute; top: 16px; bottom: 16px; left: 15px; width: 1px; background: rgba(112,81,66,.26); }
+        .progress-step { position: relative; z-index: 1; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid rgba(112,81,66,.28); border-radius: 50%; color: #705142; background: #f8f1e8; font-size: .8rem; font-weight: 700; }
+        .progress-step.active { border-color: var(--clay); color: #fffaf2; background: linear-gradient(135deg, var(--wood), var(--clay)); box-shadow: 0 0 0 4px rgba(185,111,88,.14); }
+        .botanical-accent { position: fixed; bottom: -12px; z-index: 0; width: 112px; height: 195px; opacity: .24; pointer-events: none; }
+        .botanical-accent.left { left: 3px; }
+        .botanical-accent.right { right: 3px; transform: scaleX(-1) rotate(-8deg); }
+        .botanical-stem { position: absolute; left: 49px; bottom: 0; width: 55px; height: 178px; border-left: 2px solid #547a60; border-radius: 50%; transform: rotate(14deg); }
+        .botanical-leaf { position: absolute; width: 40px; height: 21px; border-radius: 100% 0; background: linear-gradient(135deg, #9cac82, #547a60); }
+        .botanical-leaf.one { left: 48px; bottom: 71px; transform: rotate(-12deg); }
+        .botanical-leaf.two { left: 13px; bottom: 115px; transform: rotate(167deg) scale(.78); }
+        .botanical-flower { position: absolute; left: 34px; bottom: 156px; width: 12px; height: 12px; border-radius: 50%; background: #d9b47f; box-shadow: 0 -8px 0 -2px #f5e8db, 0 8px 0 -2px #f5e8db, 8px 0 0 -2px #f5e8db, -8px 0 0 -2px #f5e8db; }
+        main { position: relative; z-index: 1; width: min(100%, 1050px); padding: clamp(25px, 4vw, 44px); border: 1px solid rgba(122,82,65,.18); border-radius: 28px; background: rgba(255,250,243,.94); box-shadow: var(--shadow); }
+        .brand { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 16px; color: var(--forest); font-family: Georgia, "Times New Roman", serif; font-size: 1.12rem; }
+        .brand img { width: 38px; height: 38px; padding: 5px; border-radius: 50%; background: var(--forest); object-fit: contain; }
+        .intro { max-width: 720px; margin: 0 auto 28px; text-align: center; }
+        h1 { margin: 0; color: var(--forest); font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 500; line-height: 1.16; }
+        h2 { color: var(--forest); font-family: Georgia, "Times New Roman", serif; font-weight: 500; }
+        p { color: #4f5c54; font-size: 1.05rem; line-height: 1.55; }
+        fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+        legend, .section-label { margin: 0 0 13px; color: #463d34; font-size: 1.08rem; font-weight: 700; }
+        .gender-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+        .gender-option { min-height: 66px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 16px; border: 1px solid rgba(122,82,65,.24); border-radius: 15px; color: #34443b; background: #f5eee4; font-size: 1.05rem; font-weight: 650; cursor: pointer; transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease; }
+        .gender-option:has(input:checked) { border-color: #315e53; background: #e9eee3; box-shadow: inset 0 0 0 1px #315e53; }
+        .gender-option input { width: 20px; height: 20px; accent-color: var(--forest); }
+        .gender-option:focus-within, button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #9c654e; outline-offset: 3px; }
+        .locked-note { margin: 12px 0 27px; color: #665d51; font-size: .96rem; }
+        .creation-area { margin-top: 27px; padding-top: 25px; border-top: 1px solid var(--line); }
+        .creation-area[hidden], .photo-panel[hidden], .builder-panel[hidden], .continue-row[hidden] { display: none; }
+        .creation-heading { margin: 0 0 6px; text-align: center; font-size: 1.55rem; }
+        .creation-intro { margin: 0 auto 18px; text-align: center; }
+        .creation-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .creation-choice { min-height: 160px; padding: 23px; border: 1px solid rgba(112,81,66,.2); border-radius: 20px; color: var(--text); background: linear-gradient(145deg, #f4e8d8, #fffaf2 72%); box-shadow: 0 8px 20px rgba(65,47,35,.07); text-align: left; cursor: pointer; transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease; }
+        .creation-choice:hover { transform: translateY(-2px); border-color: rgba(49,94,83,.55); box-shadow: 0 12px 25px rgba(65,47,35,.12); }
+        .creation-choice[aria-pressed="true"] { border-color: var(--forest); box-shadow: inset 0 0 0 1px var(--forest), 0 10px 22px rgba(65,47,35,.1); }
+        .choice-icon { display: block; margin-bottom: 12px; font-size: 2rem; }
+        .choice-title { display: block; margin-bottom: 7px; color: var(--forest); font-family: Georgia, "Times New Roman", serif; font-size: 1.32rem; }
+        .choice-copy { display: block; color: #4f5c54; font-size: 1rem; line-height: 1.5; }
+        .photo-panel, .builder-panel { margin-top: 22px; padding: 22px; border: 1px solid rgba(112,81,66,.16); border-radius: 20px; background: linear-gradient(145deg, #f8f1e8, #fffdf8); }
+        .photo-panel h2, .builder-panel h2 { margin: 0 0 8px; font-size: 1.45rem; }
+        .photo-panel > p { margin: 0 0 17px; }
+        .file-picker { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+        .photo-button, .continue-button { min-height: 54px; display: inline-flex; align-items: center; justify-content: center; padding: 13px 22px; border: 0; border-radius: 999px; color: #fffaf2; background: linear-gradient(135deg, #214c43, #173a34); box-shadow: 0 7px 16px rgba(23,58,52,.18); font: inherit; font-size: 1.03rem; font-weight: 700; text-decoration: none; cursor: pointer; }
+        .photo-preview { display: block; width: min(100%, 330px); max-height: 360px; margin: 18px auto 0; border: 1px solid var(--line); border-radius: 18px; background: #eee3d4; object-fit: contain; }
+        .photo-preview[hidden] { display: none; }
+        .photo-note { margin: 12px 0 0; color: #536055; font-size: .96rem; }
+        .status { min-height: 1.5em; margin: 12px 0 0; color: #7a4638; font-size: .96rem; }
+        .builder-layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: start; gap: 24px; }
+        .preview-card { position: sticky; top: 20px; min-height: 100%; display: grid; align-content: start; justify-items: center; padding: 22px 18px 18px; border: 1px solid rgba(49,94,83,.15); border-radius: 20px; background: radial-gradient(ellipse at 50% 25%, rgba(255,255,255,.76), transparent 42%), radial-gradient(ellipse at 50% 78%, rgba(168,182,152,.38), transparent 58%), linear-gradient(150deg, #e5ece1, #fbf3e6); box-shadow: 0 12px 28px rgba(45,68,55,.1); }
+        .avatar-preview { display: block; width: min(100%, 470px); height: auto; overflow: visible; }
+        .avatar-art { display: block; width: 100%; height: auto; overflow: visible; }
+        .avatar-preview #shoulders { transform-box: fill-box; transform-origin: center; transition: transform 180ms ease; }
+        .avatar-preview .avatar-face { transition: transform 180ms ease; }
+        .avatar-preview #leftEye, .avatar-preview #rightEye { transition: transform 180ms ease; transform-box: view-box; }
+        .avatar-preview[data-build="slim"] #shoulders { transform: scaleX(.92); }
+        .avatar-preview[data-build="broad"] #shoulders { transform: scaleX(1.08); }
+        .avatar-preview[data-eyebrows="defined"] .brow-stroke { stroke-width: 5; }
+        .avatar-preview[data-nose="rounded"] .nose-tip { rx: 11; }
+        .avatar-preview[data-nose="defined"] .nose-bridge { stroke-width: 3.2; }
+        .avatar-preview[data-hair="short"] .long-hair-strands, .avatar-preview[data-hair="bob"] .long-hair-strands, .avatar-preview[data-hair="curls"] .long-hair-strands, .avatar-preview[data-hair="coils"] .long-hair-strands { display: none; }
+        .avatar-preview[data-hair="long"] .short-hair-strands { display: none; }
+        .avatar-preview .curl-texture, .avatar-preview .wave-texture, .avatar-preview .coil-texture { display: none; }
+        .avatar-preview[data-hair-texture="curls"] .curl-texture, .avatar-preview[data-hair-texture="coils"] .curl-texture { display: inline; }
+        .avatar-preview[data-hair-texture="waves"] .wave-texture { display: inline; }
+        .avatar-preview[data-hair-texture="coils"] .curl-texture { display: none; }
+        .avatar-preview[data-hair-texture="coils"] .coil-texture { display: inline; }
+        .avatar-preview[data-hair-texture="smooth"] .short-hair-strands, .avatar-preview[data-hair-texture="smooth"] .long-hair-strands { opacity: .13; }
+        .avatar-art .freckles, .avatar-art .beauty-mark, .avatar-art .glasses, .avatar-art .headband, .avatar-art .earrings { display: none; }
+        .avatar-preview[data-accessory="glasses"] .glasses { display: inline; }
+        .avatar-preview[data-accessory="headband"] .headband { display: inline; }
+        .avatar-preview[data-accessory="earrings"] .earrings { display: inline; }
+        .avatar-preview[data-feature="freckles"] .freckles { display: inline; }
+        .avatar-preview[data-feature="beauty-mark"] .beauty-mark { display: inline; }
+        .preview-caption { margin: 10px 0 0; color: #40564a; font-weight: 650; text-align: center; }
+        .customization-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+        .control { min-width: 0; }
+        .control label { display: block; margin-bottom: 6px; color: #34443b; font-size: .98rem; font-weight: 700; }
+        .control select { width: 100%; min-height: 48px; padding: 9px 34px 9px 11px; border: 1px solid rgba(112,81,66,.28); border-radius: 11px; color: #263633; background: #fffdf8; font: inherit; font-size: .96rem; }
+        .continue-row { display: flex; justify-content: center; margin-top: 22px; }
+        .continue-button:hover, .photo-button:hover { background: linear-gradient(135deg, #28594e, #1d473e); }
+        @media (max-width: 1180px) { .progress { position: relative; top: auto; left: auto; display: flex; justify-content: center; gap: 32px; margin-bottom: 18px; transform: none; } .progress::before { top: 50%; right: 16px; bottom: auto; left: 16px; width: auto; height: 1px; } }
+        @media (max-width: 820px) { .builder-layout { grid-template-columns: 1fr; } .preview-card { position: static; } .avatar-preview { width: min(100%, 480px); } }
+        @media (max-width: 700px) { body { display: block; padding: 20px 14px 32px; } main { margin: 0 auto; padding: 24px 19px; border-radius: 22px; } .gender-options { grid-template-columns: 1fr; gap: 9px; } .gender-option { justify-content: flex-start; min-height: 58px; } .creation-options { grid-template-columns: 1fr; } .creation-choice { min-height: 132px; padding: 20px; } .customization-controls { grid-template-columns: 1fr; } .photo-panel, .builder-panel { padding: 17px; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="botanical-accent left" aria-hidden="true"><span class="botanical-stem"></span><span class="botanical-leaf one"></span><span class="botanical-leaf two"></span><span class="botanical-flower"></span></div>
+    <div class="botanical-accent right" aria-hidden="true"><span class="botanical-stem"></span><span class="botanical-leaf one"></span><span class="botanical-leaf two"></span><span class="botanical-flower"></span></div>
+    <div class="progress" aria-label="Personalization progress">
+        <div class="progress-step">01</div>
+        <div class="progress-step active" aria-current="step">02</div>
+        <div class="progress-step">03</div>
+    </div>
+    <main>
+        <div class="brand" aria-label="Presence brand"><img src="presence-logo-cream.png" alt="" /><span>Presence</span></div>
+        <header class="intro">
+            <h1>How would you like your Presence to look?</h1>
+            <p>Choose a presentation first. You can then use a photo as inspiration or build a friendly avatar yourself.</p>
+        </header>
+
+        <fieldset>
+            <legend>Choose a gender presentation</legend>
+            <div class="gender-options">
+                <label class="gender-option"><input type="radio" name="gender" value="feminine" /> Feminine</label>
+                <label class="gender-option"><input type="radio" name="gender" value="masculine" /> Masculine</label>
+                <label class="gender-option"><input type="radio" name="gender" value="androgynous" /> Androgynous</label>
+            </div>
+            <p class="locked-note" id="genderHint">Select one option to see the avatar creation choices.</p>
+        </fieldset>
+
+        <section class="creation-area" id="creationArea" hidden aria-labelledby="creationTitle">
+            <h2 class="creation-heading" id="creationTitle">Choose how to create your avatar</h2>
+            <p class="creation-intro">You can change your choice any time before continuing.</p>
+            <div class="creation-options">
+                <button class="creation-choice" id="photoChoice" type="button" aria-pressed="false">
+                    <span class="choice-icon" aria-hidden="true">📷</span>
+                    <span class="choice-title">Use a photo</span>
+                    <span class="choice-copy">Create an avatar inspired by someone familiar to you.</span>
+                </button>
+                <button class="creation-choice" id="scratchChoice" type="button" aria-pressed="false">
+                    <span class="choice-icon" aria-hidden="true">✨</span>
+                    <span class="choice-title">Build from scratch</span>
+                    <span class="choice-copy">Create your Presence's appearance yourself.</span>
+                </button>
+            </div>
+
+            <section class="photo-panel" id="photoPanel" hidden aria-labelledby="photoTitle">
+                <h2 id="photoTitle">Choose a reference photo</h2>
+                <p>The selected image is only a reference. Your Presence avatar will be generated from or inspired by this image in a future step.</p>
+                <input class="file-picker" id="photoInput" type="file" accept="image/*" aria-label="Choose or take a reference photo" />
+                <button class="photo-button" id="choosePhotoButton" type="button">Choose or take a photo</button>
+                <img class="photo-preview" id="photoPreview" alt="Selected reference photo preview" hidden />
+                <p class="photo-note" id="photoFileName"></p>
+                <p class="status" id="photoStatus" role="status" aria-live="polite"></p>
+            </section>
+
+            <section class="builder-panel" id="builderPanel" hidden aria-labelledby="builderTitle">
+                <h2 id="builderTitle">Create your Presence</h2>
+                <p>Make a friendly look that feels like them. Your choices update the preview as you go.</p>
+                <div class="builder-layout">
+                    <div class="preview-card">
+                        <div class="avatar-preview" id="avatarPreview" data-hair="waves" data-face="oval" data-build="average" data-clothing="sage" data-mouth="smile" data-gender="androgynous" data-accessory="none" data-feature="none" role="img" aria-label="Live preview of your custom Presence avatar">
+                            <svg class="avatar-art" viewBox="0 0 360 420" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <linearGradient id="skinGradient" x1="0" y1="0" x2="1" y2=".35"><stop id="skinHighlight" offset="0" stop-color="#f2d0b0"/><stop id="skinMid" offset=".48" stop-color="#c98e69"/><stop id="skinShade" offset="1" stop-color="#8f5a43"/></linearGradient>
+                                    <linearGradient id="neckGradient" x1="0" y1="0" x2="1" y2="0"><stop id="neckShade" offset="0" stop-color="#98644b"/><stop id="neckLight" offset=".5" stop-color="#d3a17d"/><stop offset="1" stop-color="#98644b"/></linearGradient>
+                                    <linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2=".6"><stop offset="0" stop-color="#261c1a"/><stop id="hairMid" offset=".5" stop-color="#594036"/><stop id="hairLight" offset=".76" stop-color="#87624b"/><stop offset="1" stop-color="#2d211d"/></linearGradient>
+                                    <linearGradient id="shirtGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#173a34"/><stop offset=".44" stop-color="#4e7464"/><stop offset="1" stop-color="#173a34"/></linearGradient>
+                                    <radialGradient id="irisGradient" cx="35%" cy="30%"><stop offset="0" stop-color="#b58a5a"/><stop offset=".3" stop-color="#765334"/><stop id="irisColor" offset=".72" stop-color="#342720"/><stop offset="1" stop-color="#171513"/></radialGradient>
+                                    <linearGradient id="lipGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b7756b"/><stop offset="1" stop-color="#79433f"/></linearGradient>
+                                    <filter id="softShadow" x="-30%" y="-20%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+                                    <filter id="skinTexture" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .075"/></feComponentTransfer></filter>
+                                    <clipPath id="faceClip"><path id="faceClipPath" d="M180 73 C142 72 119 94 119 137 C118 181 128 222 150 248 C160 260 171 268 180 270 C191 268 202 260 212 248 C234 222 242 181 241 137 C240 94 218 72 180 73Z"/></clipPath>
+                                </defs>
+                                <ellipse cx="180" cy="442" rx="137" ry="18" fill="#52694f" opacity=".15" filter="url(#softShadow)"/>
+                                <g id="shoulders" transform-box="fill-box" transform-origin="center">
+                                    <path id="shirt" d="M38 470 C44 390 77 350 126 333 L155 322 L205 322 L234 333 C283 350 316 390 322 470Z" fill="url(#shirtGradient)"/>
+                                    <path d="M142 328 Q180 369 218 328" fill="none" stroke="#e5d4b9" stroke-width="4" opacity=".75"/>
+                                    <path d="M180 365 L180 470" stroke="#d8c4a3" stroke-width="1.5" opacity=".22"/>
+                                    <path d="M55 419 Q101 383 143 390 M305 419 Q259 383 217 390" fill="none" stroke="#fff" stroke-width="2" opacity=".12"/>
+                                </g>
+                                <path d="M151 257 C154 297 150 324 137 343 Q180 380 223 343 C210 323 206 295 209 257Z" fill="url(#neckGradient)"/>
+                                <path d="M151 278 Q180 300 209 278" fill="none" stroke="#80533f" stroke-width="5" opacity=".22"/>
+                                <path d="M122 165 C102 150 99 183 113 204 Q121 215 132 206Z M238 165 C258 150 261 183 247 204 Q239 215 228 206Z" fill="url(#skinGradient)" stroke="#8f5a43" stroke-opacity=".24" stroke-width="2"/>
+                                <path id="hairBack" d="M112 270 C103 212 106 137 123 101 C138 65 164 48 192 52 C232 55 255 87 259 130 C264 178 260 232 246 279 C238 250 228 230 217 215 L145 215 C131 231 120 251 112 270Z" fill="url(#hairGradient)"/>
+                                <g class="avatar-face" id="avatarFaceGroup">
+                                    <path id="faceContour" d="M180 73 C142 72 119 94 119 137 C118 181 128 222 150 248 C160 260 171 268 180 270 C191 268 202 260 212 248 C234 222 242 181 241 137 C240 94 218 72 180 73Z" fill="url(#skinGradient)"/>
+                                    <path d="M127 131 C132 102 150 85 176 81 C157 97 153 117 153 147 C153 188 164 236 180 268 C168 265 158 259 150 248 C130 223 119 181 120 140Z" fill="#ffe1c2" opacity=".16"/>
+                                    <path d="M232 135 C229 183 219 225 201 249 C195 257 188 263 180 268 C201 257 220 235 230 207 C238 184 242 151 239 124Z" fill="#70412e" opacity=".13"/>
+                                    <path d="M122 173 Q135 166 148 178 M212 178 Q226 166 239 174" fill="none" stroke="#9b624b" stroke-width="7" opacity=".13"/>
+                                    <g id="leftEye" transform="translate(151 183) scale(1 .86)"><path d="M-23 0 Q-12 -15 3 -12 Q17 -10 23 0 Q11 12 -3 11 Q-17 10 -23 0Z" fill="#fbf4e8"/><circle r="9.2" fill="url(#irisGradient)"/><circle r="4.4" fill="#171513"/><ellipse cx="-2.7" cy="-3" rx="2.5" ry="1.7" fill="#fff" opacity=".86"/><circle cx="3.4" cy="3.6" r=".8" fill="#fff" opacity=".65"/><path d="M-23 0 Q-10 -14 3 -12 Q17 -10 23 0" fill="none" stroke="#57382e" stroke-width="2.6" stroke-linecap="round"/><path d="M-18 7 Q0 14 18 6" fill="none" stroke="#986c58" stroke-width="1" opacity=".5"/></g>
+                                    <g id="rightEye" transform="translate(211 184) scale(1 .83)"><path d="M-23 0 Q-11 -14 3 -12 Q17 -10 23 0 Q10 12 -4 11 Q-17 10 -23 0Z" fill="#fbf4e8"/><circle r="9" fill="url(#irisGradient)"/><circle r="4.3" fill="#171513"/><ellipse cx="-2.5" cy="-3" rx="2.4" ry="1.7" fill="#fff" opacity=".84"/><circle cx="3" cy="3.4" r=".8" fill="#fff" opacity=".6"/><path d="M-23 0 Q-9 -14 3 -12 Q17 -10 23 0" fill="none" stroke="#57382e" stroke-width="2.4" stroke-linecap="round"/><path d="M-17 7 Q0 13 18 6" fill="none" stroke="#986c58" stroke-width="1" opacity=".5"/></g>
+                                    <path id="browLeft" class="brow-stroke" d="M128 145 Q149 137 166 145" fill="none" stroke="url(#hairGradient)" stroke-width="4" stroke-linecap="round"/><path id="browRight" class="brow-stroke" d="M195 144 Q213 137 232 145" fill="none" stroke="url(#hairGradient)" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M181 178 C181 196 176 211 173 218 Q180 224 189 219" fill="none" stroke="#87563f" stroke-width="2.5" stroke-linecap="round" opacity=".62"/>
+                                    <path id="noseBridge" d="M180 181 C181 197 178 208 174 218" fill="none" stroke="#f6d5b7" stroke-width="2" stroke-linecap="round" opacity=".7"/><ellipse id="noseTip" cx="181" cy="221" rx="8" ry="4.5" fill="#b77d60" opacity=".56"/><path d="M170 222 Q166 225 164 222 M190 222 Q194 225 197 222" fill="none" stroke="#75493a" stroke-width="1.7" stroke-linecap="round" opacity=".7"/>
+                                    <path d="M150 236 Q160 231 171 235 Q180 238 188 235 Q200 232 210 236 Q198 251 180 252 Q162 251 150 236Z" fill="url(#lipGradient)"/><path id="mouthOpening" d="M154 237 Q168 233 180 237 Q194 233 207 237 Q181 245 154 237Z" fill="#512b2a"/><path d="M159 240 Q180 247 202 240" fill="none" stroke="#e0a095" stroke-width="1.2" opacity=".7"/><path d="M139 220 Q143 233 151 239 M222 219 Q217 234 209 239" fill="none" stroke="#9e6550" stroke-width="1.6" opacity=".22"/>
+                                </g>
+                                <g clip-path="url(#faceClip)"><rect x="118" y="72" width="124" height="202" filter="url(#skinTexture)" opacity=".22"/></g>
+                                <path id="hairFront" d="M111 150 C108 112 118 82 143 65 C165 49 199 48 222 65 C244 82 252 113 247 151 C235 137 230 119 223 103 C216 122 204 129 195 107 C184 128 169 131 160 106 C148 127 135 132 127 110 C119 129 116 140 111 150Z" fill="url(#hairGradient)"/>
+                                <g class="short-hair-strands" fill="none" stroke="#d3a27c" stroke-linecap="round" opacity=".34"><path d="M126 124 Q130 89 151 69" stroke-width="1.1"/><path d="M130 116 Q136 77 166 63" stroke-width="1.5"/><path d="M139 115 Q143 81 162 68" stroke-width=".9"/><path d="M146 108 Q154 71 179 60" stroke-width="1.2"/><path d="M158 91 Q169 67 181 61" stroke-width=".8"/><path d="M176 83 Q186 59 198 62" stroke-width=".9"/><path d="M191 67 Q216 72 228 98" stroke-width="1"/><path d="M198 62 Q226 80 233 116" stroke-width="1.2"/><path d="M208 70 Q231 88 236 111" stroke-width=".9"/><path d="M215 75 Q236 96 239 131" stroke-width="1.1"/><path d="M223 91 Q239 110 241 130" stroke-width=".8"/></g>
+                                <g class="wave-texture" fill="none" stroke="#e2bd99" stroke-linecap="round" stroke-width="1.5" opacity=".48"><path d="M119 129 Q128 109 120 91 T134 65"/><path d="M137 116 Q146 95 140 77 T155 58"/><path d="M158 101 Q168 83 162 65 T178 54"/><path d="M183 91 Q193 73 188 58 T203 61"/><path d="M207 110 Q218 91 212 76 T226 83"/><path d="M230 132 Q239 115 232 99"/></g>
+                                <g class="curl-texture" fill="none" stroke="#d9b18d" stroke-linecap="round" stroke-width="2" opacity=".55"><path d="M117 122q12-18 0-31m15 17q12-19 0-33m19 19q11-15 2-28m20 17q8-16-2-28m23 31q13-14 4-25m16 40q12-15 1-27m17 47q13-14 3-28"/></g>
+                                <g class="coil-texture" fill="none" stroke="#e0b991" stroke-linecap="round" stroke-width="1.8" opacity=".62"><path d="M115 125c-8-7 7-14 0-21s8-14 1-21m17 37c-8-8 8-14 1-22s8-14 1-22m18 17c-8-8 7-15 0-22s8-14 1-22m19 14c-7-8 7-14 0-22s7-14 1-20m22 32c-8-7 7-14 0-21s8-14 1-21m18 45c-8-8 8-14 1-22s8-14 1-22m16 55c-8-7 8-14 1-21"/></g>
+                                <g class="long-hair-strands" fill="none" stroke="#d3a27c" stroke-linecap="round" opacity=".34"><path d="M116 161 Q109 215 117 259" stroke-width=".9"/><path d="M119 163 Q111 226 129 278" stroke-width="1.4"/><path d="M123 161 Q119 224 135 279" stroke-width=".8"/><path d="M127 159 Q121 230 143 287" stroke-width="1.1"/><path d="M133 155 Q131 229 150 286" stroke-width=".8"/><path d="M240 160 Q248 222 230 279" stroke-width="1.3"/><path d="M236 162 Q244 224 226 283" stroke-width=".8"/><path d="M232 166 Q239 228 218 287" stroke-width="1.1"/><path d="M226 160 Q231 225 213 282" stroke-width=".8"/><path d="M150 78 Q174 59 190 67" stroke-width="1.2"/><path d="M157 72 Q174 63 187 69" stroke-width=".8"/></g>
+                                <g class="freckles" fill="#80523f" opacity=".52"><circle cx="147" cy="207" r="1.5"/><circle cx="155" cy="211" r="1.3"/><circle cx="162" cy="206" r="1.2"/><circle cx="199" cy="207" r="1.4"/><circle cx="207" cy="211" r="1.2"/><circle cx="214" cy="206" r="1.3"/></g><circle class="beauty-mark" cx="218" cy="225" r="2.1" fill="#714332"/>
+                                <g class="glasses" fill="none" stroke="#59493b" stroke-width="3"><path d="M126 176 Q147 168 168 177 L166 193 Q148 202 131 192Z"/><path d="M192 177 Q213 168 234 176 L229 192 Q212 202 194 193Z"/><path d="M168 180 Q180 173 192 180 M126 180 L117 176 M234 179 L243 175"/></g>
+                                <path class="headband" d="M119 133 Q178 101 241 134" fill="none" stroke="#b96851" stroke-width="9" stroke-linecap="round"/><g class="earrings" fill="none" stroke="#d0ad72" stroke-width="3"><circle cx="119" cy="205" r="5"/><circle cx="241" cy="205" r="5"/></g>
+                            </svg>
+                        </div>
+                        <p class="preview-caption">Your Presence, taking shape</p>
+                    </div>
+                    <div class="customization-controls">
+                        <div class="control"><label for="skinTone">Skin tone</label><select id="skinTone" data-avatar-field="skinTone"><option value="#f0c9a8">Warm light</option><option value="#c98e69" selected>Golden</option><option value="#9d6549">Warm brown</option><option value="#613e32">Deep brown</option></select></div>
+                        <div class="control"><label for="faceShape">Face shape</label><select id="faceShape" data-avatar-field="faceShape"><option value="oval" selected>Soft oval</option><option value="round">Round</option><option value="heart">Heart</option></select></div>
+                        <div class="control"><label for="faceProportions">Face proportions</label><select id="faceProportions" data-avatar-field="faceProportions"><option value="balanced" selected>Balanced</option><option value="slender">Slender</option><option value="fuller">Fuller</option></select></div>
+                        <div class="control"><label for="hairStyle">Hair style</label><select id="hairStyle" data-avatar-field="hairStyle"><option value="waves" selected>Soft waves</option><option value="short">Short</option><option value="long">Long</option><option value="bob">Curved bob</option><option value="curls">Curls</option><option value="coils">Coils</option></select></div>
+                        <div class="control"><label for="hairTexture">Hair texture</label><select id="hairTexture" data-avatar-field="hairTexture"><option value="waves" selected>Soft waves</option><option value="smooth">Smooth</option><option value="curls">Defined curls</option><option value="coils">Coils</option></select></div>
+                        <div class="control"><label for="hairColor">Hair colour</label><select id="hairColor" data-avatar-field="hairColor"><option value="#45302a" selected>Deep brown</option><option value="#171717">Soft black</option><option value="#98543d">Auburn</option><option value="#8b8a83">Silver</option></select></div>
+                        <div class="control"><label for="eyeStyle">Eyes</label><select id="eyeStyle" data-avatar-field="eyeStyle"><option value="natural" selected>Natural almond</option><option value="open">Open and rounded</option><option value="hooded">Softly hooded</option></select></div>
+                        <div class="control"><label for="eyeColor">Eye colour</label><select id="eyeColor" data-avatar-field="eyeColor"><option value="#342720" selected>Warm brown</option><option value="#526c54">Forest green</option><option value="#777044">Hazel</option><option value="#292d32">Deep brown</option></select></div>
+                        <div class="control"><label for="eyebrowStyle">Eyebrows</label><select id="eyebrowStyle" data-avatar-field="eyebrowStyle"><option value="soft" selected>Soft</option><option value="defined">Defined</option><option value="arched">Arched</option></select></div>
+                        <div class="control"><label for="noseStyle">Nose</label><select id="noseStyle" data-avatar-field="noseStyle"><option value="petite" selected>Petite</option><option value="rounded">Rounded</option><option value="defined">Defined</option></select></div>
+                        <div class="control"><label for="mouthStyle">Mouth</label><select id="mouthStyle" data-avatar-field="mouthStyle"><option value="smile" selected>Gentle smile</option><option value="calm">Calm</option><option value="bright">Bright smile</option></select></div>
+                        <div class="control"><label for="facialFeatures">Facial features</label><select id="facialFeatures" data-avatar-field="facialFeatures"><option value="none" selected>None</option><option value="freckles">Freckles</option><option value="beauty-mark">Beauty mark</option></select></div>
+                        <div class="control"><label for="bodyBuild">Body / build</label><select id="bodyBuild" data-avatar-field="bodyBuild"><option value="average" selected>Everyday</option><option value="slim">Slender</option><option value="broad">Broad</option></select></div>
+                        <div class="control"><label for="clothing">Clothing</label><select id="clothing" data-avatar-field="clothing"><option value="sage" selected>Sage sweater</option><option value="cream">Cream top</option><option value="clay">Terracotta top</option><option value="lavender">Lavender jacket</option></select></div>
+                        <div class="control"><label for="accessory">Accessories</label><select id="accessory" data-avatar-field="accessory"><option value="none" selected>None</option><option value="glasses">Glasses</option><option value="headband">Headband</option><option value="earrings">Earrings</option></select></div>
+                    </div>
+                </div>
+            </section>
+            <div class="continue-row" id="continueRow" hidden><button class="continue-button" id="continueButton" type="button">Continue →</button></div>
+            <p class="status" id="flowStatus" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script>
+        const profileKey = 'presenceProfile';
+        const legacyProfileKey = 'presencePersonalization';
+        const allowedGenders = ['feminine', 'masculine', 'androgynous'];
+        const customizationDefaults = {
+            skinTone: '#c98e69', faceShape: 'oval', faceProportions: 'balanced', hairStyle: 'waves', hairTexture: 'waves', hairColor: '#45302a', eyeStyle: 'natural', eyeColor: '#342720',
+            eyebrowStyle: 'soft', noseStyle: 'petite', mouthStyle: 'smile', facialFeatures: 'none', bodyBuild: 'average',
+            clothing: 'sage', accessory: 'none'
+        };
+        function readProfile() {
+            try {
+                const stored = localStorage.getItem(profileKey) || localStorage.getItem(legacyProfileKey) || '{}';
+                const profile = JSON.parse(stored);
+                return profile && typeof profile === 'object' && !Array.isArray(profile) ? profile : {};
+            } catch (error) { return {}; }
+        }
+        let profile = readProfile();
+        function saveProfile() {
+            localStorage.setItem(profileKey, JSON.stringify(profile));
+            localStorage.removeItem(legacyProfileKey);
+        }
+
+        const creationArea = document.getElementById('creationArea');
+        const genderHint = document.getElementById('genderHint');
+        const photoChoice = document.getElementById('photoChoice');
+        const scratchChoice = document.getElementById('scratchChoice');
+        const photoPanel = document.getElementById('photoPanel');
+        const builderPanel = document.getElementById('builderPanel');
+        const continueRow = document.getElementById('continueRow');
+        const flowStatus = document.getElementById('flowStatus');
+        const photoInput = document.getElementById('photoInput');
+        const photoPreview = document.getElementById('photoPreview');
+        function setGender(gender) {
+            if (!allowedGenders.includes(gender)) return;
+            profile.gender = gender;
+            saveProfile();
+            if (profile.avatarMethod === 'custom') avatarPreview.dataset.gender = gender;
+            creationArea.hidden = false;
+            genderHint.textContent = 'Your choice is saved. Choose how you would like to create your avatar.';
+        }
+        document.querySelectorAll('input[name="gender"]').forEach(option => {
+            option.addEventListener('change', () => setGender(option.value));
+            if (option.value === profile.gender) option.checked = true;
+        });
+        if (allowedGenders.includes(profile.gender)) {
+            creationArea.hidden = false;
+            genderHint.textContent = 'Your choice is saved. Choose how you would like to create your avatar.';
+        }
+
+        function chooseMethod(method) {
+            profile.avatarMethod = method;
+            if (method === 'custom') delete profile.avatarReference;
+            photoChoice.setAttribute('aria-pressed', String(method === 'photo'));
+            scratchChoice.setAttribute('aria-pressed', String(method === 'custom'));
+            photoPanel.hidden = method !== 'photo';
+            builderPanel.hidden = method !== 'custom';
+            continueRow.hidden = method === 'photo' ? !profile.avatarReference : false;
+            flowStatus.textContent = '';
+            saveProfile();
+        }
+        photoChoice.addEventListener('click', () => {
+            chooseMethod('photo');
+            showSavedPhoto(profile.avatarReference);
+            photoInput.click();
+        });
+        scratchChoice.addEventListener('click', () => {
+            chooseMethod('custom');
+            initializeBuilder();
+        });
+        document.getElementById('choosePhotoButton').addEventListener('click', () => photoInput.click());
+
+        function showSavedPhoto(reference) {
+            if (!reference || typeof reference.dataUrl !== 'string' || !reference.dataUrl.startsWith('data:image/')) return false;
+            photoPreview.src = reference.dataUrl;
+            photoPreview.hidden = false;
+            document.getElementById('photoFileName').textContent = reference.name ? `Reference photo: ${reference.name}` : 'Reference photo selected.';
+            continueRow.hidden = false;
+            return true;
+        }
+        if (profile.avatarMethod === 'photo') {
+            creationArea.hidden = !allowedGenders.includes(profile.gender);
+            if (!creationArea.hidden) {
+                chooseMethod('photo');
+                showSavedPhoto(profile.avatarReference);
+            }
+        }
+
+        photoInput.addEventListener('change', () => {
+            const file = photoInput.files && photoInput.files[0];
+            const photoStatus = document.getElementById('photoStatus');
+            if (!file) return;
+            if (!file.type || !file.type.startsWith('image/')) {
+                photoStatus.textContent = 'Please choose an image file.';
+                photoInput.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onerror = () => { photoStatus.textContent = 'This image could not be opened. Try another photo.'; };
+            reader.onload = () => {
+                const image = new Image();
+                image.onerror = () => { photoStatus.textContent = 'This image could not be previewed. Try another photo.'; };
+                image.onload = () => {
+                    const scale = Math.min(1, 512 / Math.max(image.naturalWidth, image.naturalHeight));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+                    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+                    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+                    profile.avatarMethod = 'photo';
+                    profile.avatarReference = { dataUrl, name: file.name, type: file.type };
+                    delete profile.avatarCustomization;
+                    try {
+                        saveProfile();
+                        photoPreview.src = dataUrl;
+                        photoPreview.hidden = false;
+                        document.getElementById('photoFileName').textContent = `Reference photo: ${file.name}`;
+                        photoStatus.textContent = 'Photo saved as a reference. Your Presence avatar has not been generated.';
+                        continueRow.hidden = false;
+                    } catch (error) {
+                        photoStatus.textContent = 'The preview is ready, but this image could not be saved in browser storage. Try a smaller photo.';
+                        photoPreview.src = URL.createObjectURL(file);
+                        photoPreview.hidden = false;
+                        continueRow.hidden = true;
+                    }
+                };
+                image.src = String(reader.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        const avatarPreview = document.getElementById('avatarPreview');
+        const avatarFields = [...document.querySelectorAll('[data-avatar-field]')];
+        function applyCustomization(customization) {
+            const choices = { ...customizationDefaults, ...(customization || {}) };
+            const values = Object.fromEntries(avatarFields.map(field => [field.dataset.avatarField, [...field.options].some(option => option.value === choices[field.dataset.avatarField]) ? choices[field.dataset.avatarField] : customizationDefaults[field.dataset.avatarField]]));
+            avatarFields.forEach(field => { field.value = values[field.dataset.avatarField]; });
+            const skinPalettes = {
+                '#f0c9a8': ['#ffe4c9', '#f0c9a8', '#b57c5a', '#f0c9a8', '#a86f50'],
+                '#c98e69': ['#f1c39c', '#c98e69', '#87523d', '#d3a17d', '#98644b'],
+                '#9d6549': ['#d69870', '#9d6549', '#623b2e', '#aa7354', '#754633'],
+                '#613e32': ['#a97558', '#613e32', '#39241f', '#805740', '#482d25']
+            };
+            const hairPalettes = {
+                '#45302a': ['#594036', '#87624b'], '#171717': ['#34302d', '#766154'],
+                '#98543d': ['#b36c4f', '#d39a72'], '#8b8a83': ['#aaa89e', '#ded8c8']
+            };
+            const skin = skinPalettes[values.skinTone];
+            document.getElementById('skinHighlight').setAttribute('stop-color', skin[0]);
+            document.getElementById('skinMid').setAttribute('stop-color', skin[1]);
+            document.getElementById('skinShade').setAttribute('stop-color', skin[2]);
+            document.getElementById('neckLight').setAttribute('stop-color', skin[3]);
+            document.getElementById('neckShade').setAttribute('stop-color', skin[4]);
+            const hair = hairPalettes[values.hairColor];
+            document.getElementById('hairMid').setAttribute('stop-color', hair[0]);
+            document.getElementById('hairLight').setAttribute('stop-color', hair[1]);
+            document.getElementById('irisColor').setAttribute('stop-color', values.eyeColor);
+            const clothingColors = { sage: ['#244d43', '#638473'], cream: ['#b9a987', '#eee0c5'], clay: ['#914a3b', '#d08b70'], lavender: ['#645b75', '#b3a3c0'] };
+            const shirtColors = clothingColors[values.clothing];
+            const shirtGradient = document.getElementById('shirtGradient');
+            shirtGradient.children[0].setAttribute('stop-color', shirtColors[0]);
+            shirtGradient.children[1].setAttribute('stop-color', shirtColors[1]);
+            shirtGradient.children[2].setAttribute('stop-color', shirtColors[0]);
+            avatarPreview.dataset.hair = values.hairStyle;
+            avatarPreview.dataset.hairTexture = values.hairTexture;
+            avatarPreview.dataset.face = values.faceShape;
+            avatarPreview.dataset.build = values.bodyBuild;
+            avatarPreview.dataset.clothing = values.clothing;
+            avatarPreview.dataset.mouth = values.mouthStyle;
+            avatarPreview.dataset.eyebrows = values.eyebrowStyle;
+            avatarPreview.dataset.nose = values.noseStyle;
+            avatarPreview.dataset.gender = profile.gender || 'androgynous';
+            avatarPreview.dataset.accessory = values.accessory;
+            avatarPreview.dataset.feature = values.facialFeatures;
+            const genderScale = { feminine: 0.985, masculine: 1.025, androgynous: 1 }[profile.gender] || 1;
+            const proportionScale = { slender: 0.94, balanced: 1, fuller: 1.06 }[values.faceProportions] || 1;
+            const faceScale = genderScale * proportionScale;
+            document.getElementById('avatarFaceGroup').setAttribute('transform', `translate(180 0) scale(${faceScale} 1) translate(-180 0)`);
+            const eyeScale = { natural: 0.86, open: 1, hooded: 0.7 }[values.eyeStyle] || 0.86;
+            document.getElementById('leftEye').setAttribute('transform', `translate(151 183) scale(1 ${eyeScale})`);
+            document.getElementById('rightEye').setAttribute('transform', `translate(211 184) scale(1 ${eyeScale * 0.965})`);
+
+            const facePaths = {
+                oval: 'M180 73 C142 72 119 94 119 137 C118 181 128 222 150 248 C160 260 171 268 180 270 C191 268 202 260 212 248 C234 222 242 181 241 137 C240 94 218 72 180 73Z',
+                round: 'M180 75 C139 75 114 104 116 151 C117 198 133 237 154 255 C163 263 173 268 180 269 C188 268 198 263 207 255 C228 237 243 198 244 151 C246 104 221 75 180 75Z',
+                heart: 'M180 73 C140 70 117 94 119 139 C121 182 135 220 153 246 C163 260 173 269 180 271 C188 269 198 260 207 246 C225 220 239 182 241 139 C243 94 220 70 180 73Z'
+            };
+            const facePath = facePaths[values.faceShape];
+            document.getElementById('faceContour').setAttribute('d', facePath);
+            document.getElementById('faceClipPath').setAttribute('d', facePath);
+
+            const hairBackPaths = {
+                waves: 'M112 270 C103 212 106 137 123 101 C138 65 164 48 192 52 C232 55 255 87 259 130 C264 178 260 232 246 279 C238 250 228 230 217 215 L145 215 C131 231 120 251 112 270Z',
+                short: 'M113 226 C104 174 107 119 126 87 C143 57 164 48 191 52 C227 55 251 83 257 122 C261 154 254 186 246 211 L229 216 L132 216Z',
+                long: 'M109 290 C101 206 103 130 122 93 C139 59 164 46 193 51 C234 55 258 87 261 132 C267 201 262 287 248 356 L222 366 L137 360 L111 345Z',
+                bob: 'M108 284 C101 201 103 130 122 93 C139 59 164 46 193 51 C234 55 258 87 261 132 C267 192 257 247 244 294 L223 305 L136 301Z',
+                curls: 'M106 274 C96 236 101 160 102 126 C104 81 137 50 178 49 C220 46 254 77 258 121 C262 168 260 239 248 276 C237 244 229 226 218 212 L142 212 C126 231 116 253 106 274Z',
+                coils: 'M102 274 C90 228 96 148 97 117 C99 69 134 40 178 39 C225 36 261 70 263 119 C267 170 264 238 250 278 C237 245 229 225 217 211 L141 211 C124 233 113 253 102 274Z'
+            };
+            const hairFrontPaths = {
+                waves: 'M111 150 C108 112 118 82 143 65 C165 49 199 48 222 65 C244 82 252 113 247 151 C235 137 230 119 223 103 C216 122 204 129 195 107 C184 128 169 131 160 106 C148 127 135 132 127 110 C119 129 116 140 111 150Z',
+                short: 'M112 153 C108 113 119 82 143 64 C165 48 199 48 222 65 C244 82 251 113 247 150 C231 137 227 118 222 105 C207 118 195 117 185 105 C170 117 156 117 147 104 C133 119 121 136 112 153Z',
+                long: 'M111 151 C105 108 119 76 146 61 C174 44 207 52 228 73 C245 91 251 119 247 153 C235 138 229 117 222 101 C211 122 201 126 192 104 C181 124 166 129 157 105 C145 128 132 131 125 108 C119 129 116 141 111 151Z',
+                bob: 'M111 151 C108 109 120 79 145 62 C171 46 203 50 224 69 C245 88 251 119 247 153 C235 137 231 119 222 104 C211 125 200 128 191 106 C180 127 165 130 156 106 C144 128 132 132 125 110 C119 130 115 142 111 151Z',
+                curls: 'M111 150 C105 104 128 65 173 62 C216 56 249 94 246 143 C233 129 229 117 220 105 C213 124 202 128 194 108 C182 128 169 129 160 106 C147 128 132 132 127 111 C119 130 116 140 111 150Z',
+                coils: 'M105 151 C94 102 123 55 174 54 C224 50 256 94 249 150 C237 133 236 116 226 104 C222 126 207 135 196 111 C187 133 168 134 159 109 C148 132 132 136 126 113 C116 132 113 145 105 151Z'
+            };
+            document.getElementById('hairBack').setAttribute('d', hairBackPaths[values.hairStyle]);
+            document.getElementById('hairFront').setAttribute('d', hairFrontPaths[values.hairStyle]);
+            document.querySelector('.curl-texture').style.display = values.hairTexture === 'curls' ? 'inline' : 'none';
+            document.querySelector('.coil-texture').style.display = values.hairTexture === 'coils' ? 'inline' : 'none';
+            document.querySelector('.wave-texture').style.display = values.hairTexture === 'waves' ? 'inline' : 'none';
+
+            const browPaths = {
+                soft: ['M128 145 Q149 137 166 145', 'M195 144 Q213 137 232 145'],
+                defined: ['M128 145 Q149 135 166 145', 'M195 144 Q213 135 232 145'],
+                arched: ['M128 145 Q149 132 166 144', 'M195 143 Q213 131 232 144']
+            }[values.eyebrowStyle];
+            document.getElementById('browLeft').setAttribute('d', browPaths[0]);
+            document.getElementById('browRight').setAttribute('d', browPaths[1]);
+            document.getElementById('noseTip').setAttribute('rx', values.noseStyle === 'rounded' ? '11' : values.noseStyle === 'defined' ? '6.5' : '8');
+            document.getElementById('noseBridge').setAttribute('stroke-width', values.noseStyle === 'defined' ? '3.2' : '2');
+            const mouthPaths = {
+                smile: 'M154 237 Q168 233 180 237 Q194 233 207 237 Q181 245 154 237Z',
+                calm: 'M155 242 Q180 246 205 241',
+                bright: 'M153 239 Q180 257 207 238 Q181 270 153 239Z'
+            };
+            const mouthOpening = document.getElementById('mouthOpening');
+            mouthOpening.setAttribute('d', mouthPaths[values.mouthStyle]);
+            mouthOpening.setAttribute('fill', values.mouthStyle === 'calm' ? 'none' : '#512b2a');
+            mouthOpening.setAttribute('stroke', values.mouthStyle === 'calm' ? '#79433f' : 'none');
+            mouthOpening.setAttribute('stroke-width', values.mouthStyle === 'calm' ? '2' : '0');
+            return values;
+        }
+        function initializeBuilder() {
+            const values = applyCustomization(profile.avatarCustomization);
+            avatarFields.forEach(field => {
+                field.onchange = () => {
+                    profile.avatarCustomization = applyCustomization(Object.fromEntries(avatarFields.map(item => [item.dataset.avatarField, item.value])));
+                    profile.avatarMethod = 'custom';
+                    delete profile.avatarReference;
+                    saveProfile();
+                    continueRow.hidden = false;
+                };
+            });
+            if (!profile.avatarCustomization) profile.avatarCustomization = values;
+            profile.avatarMethod = 'custom';
+            saveProfile();
+            continueRow.hidden = false;
+        }
+        if (profile.avatarMethod === 'custom' && allowedGenders.includes(profile.gender)) {
+            chooseMethod('custom');
+            initializeBuilder();
+        }
+
+        document.getElementById('continueButton').addEventListener('click', () => {
+            if (!allowedGenders.includes(profile.gender)) {
+                flowStatus.textContent = 'Choose a gender presentation before continuing.';
+                return;
+            }
+            if (profile.avatarMethod === 'photo' && !profile.avatarReference) {
+                flowStatus.textContent = 'Choose a reference photo before continuing.';
+                return;
+            }
+            if (profile.avatarMethod !== 'custom' && profile.avatarMethod !== 'photo') {
+                flowStatus.textContent = 'Choose a photo or build your avatar before continuing.';
+                return;
+            }
+            saveProfile();
+            window.location.href = 'presence-personality.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Give your Presence a name | Presence</title>
+    <style>
+        html { scrollbar-width: auto; scrollbar-color: #315e53 #f4e9db; }
+        ::-webkit-scrollbar { width: 18px; height: 18px; }
+        ::-webkit-scrollbar-track { background: #f4e9db; border-left: 1px solid rgba(77, 56, 47, 0.12); }
+        ::-webkit-scrollbar-thumb { background: #315e53; border: 3px solid #f4e9db; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #244a41; }
+        ::-webkit-scrollbar-thumb:active { background: #1c3c35; }
+        @media (pointer: coarse) { ::-webkit-scrollbar { width: initial; height: initial; } }
+
+        body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(135deg, #f7f1e9, #e8d8c8); color: #263633; font-family: "Segoe UI", Tahoma, sans-serif; }
+        main { width: min(100%, 620px); padding: 42px 32px; border: 1px solid rgba(122,82,65,.18); border-radius: 24px; background: rgba(255,250,243,.9); box-shadow: 0 20px 55px rgba(70,48,36,.14); text-align: center; }
+        h1 { margin: 0; color: #173a34; font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 550; }
+        p { margin: 16px 0 26px; font-size: 1.1rem; line-height: 1.6; }
+        a { display: inline-block; padding: 13px 20px; border-radius: 999px; background: #173a34; color: #fffaf2; font-size: 1rem; font-weight: 700; text-decoration: none; }
+        a:focus-visible { outline: 4px solid #b96f58; outline-offset: 4px; }
+        label { display: block; margin: 0 0 8px; color: #173a34; font-weight: 650; text-align: left; }
+        textarea { display: block; width: 100%; min-height: 190px; margin-bottom: 8px; padding: 14px; border: 1px solid rgba(122,82,65,.28); border-radius: 12px; color: #263633; background: #fffdf8; font: inherit; line-height: 1.55; resize: vertical; }
+        textarea:focus-visible { outline: 3px solid #b96f58; outline-offset: 2px; }
+        .character-count { margin: 0 0 22px; color: #59635c; font-size: 0.92rem; text-align: right; }
+        button { padding: 13px 20px; border: 0; border-radius: 999px; color: #fffaf2; background: #173a34; font: inherit; font-weight: 700; cursor: pointer; }
+        button:focus-visible { outline: 4px solid #b96f58; outline-offset: 4px; }
+        .actions { display: flex; justify-content: center; }
+        @media (max-width: 480px) { body { padding: 16px; } main { padding: 30px 20px; } textarea { min-height: 170px; } }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Give your Presence a name</h1>
+        <p>Choose a name for your Presence — something warm, familiar, meaningful, or simply a name you like.</p>
+        <form id="nameForm">
+            <label for="presenceName">Presence name</label>
+            <textarea id="presenceName" name="presenceName" maxlength="1000" aria-describedby="nameCharacterCount" placeholder="Type the name you have in mind..."></textarea>
+            <p class="character-count" id="nameCharacterCount" aria-live="polite">0 / 1,000 characters</p>
+            <div class="actions"><button type="submit">Continue →</button></div>
+        </form>
+    </main>
+    <script>
+        const storageKey = 'presenceProfile';
+        const oldStorageKey = 'presencePersonalization';
+        function readProfile() {
+            try {
+                const value = JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem(oldStorageKey) || '{}');
+                return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+            } catch (error) { return {}; }
+        }
+        const personalization = readProfile();
+        const nameInput = document.getElementById('presenceName');
+        const characterCount = document.getElementById('nameCharacterCount');
+        nameInput.value = typeof personalization.name === 'string' ? personalization.name.slice(0, 1000) : '';
+        function updateCharacterCount() {
+            if (nameInput.value.length > 1000) nameInput.value = nameInput.value.slice(0, 1000);
+            characterCount.textContent = `${nameInput.value.length.toLocaleString()} / 1,000 characters`;
+        }
+        function saveName() {
+            const data = readProfile();
+            const name = nameInput.value;
+            if (name) data.name = name;
+            else delete data.name;
+            if (Object.keys(data).length) localStorage.setItem(storageKey, JSON.stringify(data));
+            else localStorage.removeItem(storageKey);
+            localStorage.removeItem(oldStorageKey);
+        }
+        updateCharacterCount();
+        nameInput.addEventListener('input', () => {
+            updateCharacterCount();
+            saveName();
+        });
+        document.getElementById('nameForm').addEventListener('submit', event => {
+            event.preventDefault();
+            saveName();
+            window.location.href = 'presence-avatar.html';
+        });
+    </script>
+</body>
+</html>

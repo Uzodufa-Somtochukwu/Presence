@@ -1,0 +1,7 @@
+{
+  "name": "Presence",
+  "description": "Mindfulness and personal growth application imported from GitHub.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
