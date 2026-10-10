@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { readChatHistory, writeChatHistory } from '../../utils/storage.js';
 import CompanionAvatarView from '../common/CompanionAvatarView.jsx';
-
+// import {BASE_URL} from '../src/config/index.jsx';
+import {BASE_URL} from '../../../src/config/index.jsx'
 export default function ChatDrawer({ isOpen, onClose, companion, userName }) {
   const [messages, setMessages] = useState(() =>
     readChatHistory(companion.displayName, userName)
@@ -49,7 +50,7 @@ export default function ChatDrawer({ isOpen, onClose, companion, userName }) {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
+      const response = await fetch(`${BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

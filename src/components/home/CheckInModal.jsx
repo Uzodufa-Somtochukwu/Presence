@@ -3,10 +3,11 @@ import { readMoodEntries, writeMoodEntries } from '../../utils/storage.js';
 import { usePresence } from '../../context/PresenceContext.jsx';
 import { useConnection } from 'wagmi';
 import { addPointsHistory, getPresencePoints } from '../../utils/points.js';
+import { BASE_URL } from '../../config/index.jsx';
 
 const CHECK_IN_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours
 const LAST_CHECK_IN_KEY = 'presenceLastCheckIn';
-const POINTS_AWARD_URL = 'http://localhost:3001/api/points/award';
+const POINTS_AWARD_URL = `${BASE_URL}/api/points/award`;
 const CHECK_IN_REWARD = 5;
 
 export default function CheckInModal({ isOpen, onClose }) {

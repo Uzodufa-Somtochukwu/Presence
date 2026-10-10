@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import CompanionAvatarView from '../common/CompanionAvatarView.jsx';
 import { readChatHistory, writeChatHistory } from '../../utils/storage.js';
 import { usePresence } from '../../context/PresenceContext.jsx';
+import { BASE_URL } from '../../config/index.jsx';
 
-const CHAT_ENDPOINT = 'http://localhost:3001/api/chat';
-const TTS_ENDPOINT = 'http://localhost:3001/api/tts';
+const CHAT_ENDPOINT = `${BASE_URL}/api/chat`;
+const TTS_ENDPOINT = `${BASE_URL}/api/tts`;
 const SILENCE_DELAY = 2000;
 
 function cleanSpeechText(text) {
