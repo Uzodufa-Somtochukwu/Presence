@@ -417,7 +417,7 @@ export default function VoiceTalkModal({ isOpen, onClose, companion, userName })
         : 'I had trouble hearing that. Please try the microphone again.');
     };
     recognitionRef.current = recognition;
-    startListening();
+    // startListening();
 
     return () => {
       activeRef.current = false;
