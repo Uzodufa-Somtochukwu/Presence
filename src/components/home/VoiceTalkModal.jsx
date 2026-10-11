@@ -93,26 +93,40 @@ export default function VoiceTalkModal({ isOpen, onClose, companion, userName })
     ? 'companion'
     : 'default';
 
-    const audioUnlockedRef = useRef(false);
+   const audioUnlockedRef = useRef(false);
 const playerRef = useRef(null);
 
-const unlockAudio = async () => {
-  // Call this directly from a user click/tap handler.
-  const player = new Audio(
-    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
-  );
+const SILENT_WAV =
+  'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 
-  playerRef.current = player;
+// MUST be called synchronously from a tap/click handler
+const unlockAudio = () => {
+  if (!playerRef.current) playerRef.current = new Audio();
+  const player = playerRef.current;
 
+  // Also unlock speechSynthesis for the device-voice fallback
   try {
-    await player.play();
-    player.pause();
-    player.currentTime = 0;
-    audioUnlockedRef.current = true;
-  } catch (error) {
-    console.error('iPhone audio unlock failed:', error);
-    audioUnlockedRef.current = false;
-  }
+    const synth = window.speechSynthesis;
+    if (synth && typeof window.SpeechSynthesisUtterance === 'function') {
+      const u = new window.SpeechSynthesisUtterance('');
+      u.volume = 0;
+      synth.speak(u);
+    }
+  } catch { /* ignore */ }
+
+  if (audioUnlockedRef.current) return;
+
+  player.src = SILENT_WAV;
+  player.play()
+    .then(() => {
+      player.pause();
+      player.currentTime = 0;
+      audioUnlockedRef.current = true;
+    })
+    .catch((error) => {
+      console.error('iOS audio unlock failed:', error);
+      audioUnlockedRef.current = false;
+    });
 };
 
   useEffect(() => {
@@ -134,7 +148,7 @@ const unlockAudio = async () => {
   };
 
   const startListening = () => {
-    unlockAudio()
+   
     const recognition = recognitionRef.current;
     if (!activeRef.current || !recognition || recognitionRunningRef.current || phaseRef.current === 'Thinking...' || phaseRef.current === 'Speaking...' || phaseRef.current === 'Paused') return;
 
@@ -307,56 +321,69 @@ const unlockAudio = async () => {
         return;
       }
 
-      const audioBlob = await ttsResponse.blob();
-      if (!activeRef.current) return;
+      const rawBlob = await ttsResponse.blob();
+if (!activeRef.current) return;
 
-      const audioUrl = URL.createObjectURL(audioBlob);
-      audioUrlRef.current = audioUrl;
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
+// iOS needs a valid audio MIME type
+const audioBlob = rawBlob.type && rawBlob.type.startsWith('audio/')
+  ? rawBlob
+  : new Blob([rawBlob], { type: 'audio/mpeg' });
 
-      const finishAudio = (failed = false) => {
-        if (audioRef.current !== audio) return;
-        window.clearTimeout(speechTimerRef.current);
-        audio.onloadedmetadata = null;
-        audio.onended = null;
-        audio.onerror = null;
-        audioRef.current = null;
-        audio.pause();
-        audio.src = '';
-        URL.revokeObjectURL(audioUrl);
-        audioUrlRef.current = null;
-        if (!activeRef.current) return;
-        if (failed) {
-          speakWithDeviceVoice(answer);
-        } else {
-          changePhase('Ready');
-          resumeListening();
-        }
-      };
+const audioUrl = URL.createObjectURL(audioBlob);
+audioUrlRef.current = audioUrl;
 
-      audio.onloadedmetadata = () => {
-        const duration = Number.isFinite(audio.duration) ? audio.duration * 1000 + 5000 : 60000;
-        speechTimerRef.current = window.setTimeout(() => finishAudio(true), Math.min(Math.max(duration, 15000), 90000));
-      };
-      audio.onended = () => finishAudio();
-      audio.onerror = () => finishAudio(true);
-      changePhase('Speaking...');
+// Reuse the element that was unlocked during the user's tap
+const audio = playerRef.current || new Audio();
+playerRef.current = audio;
+audioRef.current = audio;
 
-      try {
+const finishAudio = (failed = false) => {
+  if (audioRef.current !== audio) return;
+  window.clearTimeout(speechTimerRef.current);
+  audio.onloadedmetadata = null;
+  audio.onended = null;
+  audio.onerror = null;
+  audioRef.current = null;
+  audio.pause();
+  audio.removeAttribute('src'); // don't create a new element, keep it unlocked
+  audio.load();
+  URL.revokeObjectURL(audioUrl);
+  audioUrlRef.current = null;
+  if (!activeRef.current) return;
+  if (failed) {
+    speakWithDeviceVoice(answer);
+  } else {
+    changePhase('Ready');
+    resumeListening();
+  }
+};
+
+audio.onloadedmetadata = () => {
+  const duration = Number.isFinite(audio.duration) ? audio.duration * 1000 + 5000 : 60000;
+  speechTimerRef.current = window.setTimeout(
+    () => finishAudio(true),
+    Math.min(Math.max(duration, 15000), 90000)
+  );
+};
+audio.onended = () => finishAudio();
+audio.onerror = () => finishAudio(true);
+
+audio.src = audioUrl;
+audio.load();
+changePhase('Speaking...');
+
+try {
   await audio.play();
 } catch (error) {
-  console.error("Audio playback failed:", {
+  console.error('Audio playback failed:', {
     name: error.name,
     message: error.message,
-    browser: navigator.userAgent,
     audioReadyState: audio.readyState,
-    audioSource: audio.currentSrc,
   });
-  setErrorMessage(error.message)
-
   finishAudio(true);
 }
+
+      
     } catch (error) {
       if (!activeRef.current) return;
       changePhase('Error');
@@ -483,6 +510,7 @@ const unlockAudio = async () => {
   if (!isOpen) return null;
 
   const toggleListening = () => {
+     unlockAudio()
     if (phase === 'Listening...') {
       window.clearTimeout(silenceTimerRef.current);
       changePhase('Paused');
