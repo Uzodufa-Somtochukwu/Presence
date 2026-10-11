@@ -93,6 +93,28 @@ export default function VoiceTalkModal({ isOpen, onClose, companion, userName })
     ? 'companion'
     : 'default';
 
+    const audioUnlockedRef = useRef(false);
+const playerRef = useRef(null);
+
+const unlockAudio = async () => {
+  // Call this directly from a user click/tap handler.
+  const player = new Audio(
+    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
+  );
+
+  playerRef.current = player;
+
+  try {
+    await player.play();
+    player.pause();
+    player.currentTime = 0;
+    audioUnlockedRef.current = true;
+  } catch (error) {
+    console.error('iPhone audio unlock failed:', error);
+    audioUnlockedRef.current = false;
+  }
+};
+
   useEffect(() => {
     const synthesis = window.speechSynthesis;
     if (!synthesis) return undefined;
@@ -112,6 +134,7 @@ export default function VoiceTalkModal({ isOpen, onClose, companion, userName })
   };
 
   const startListening = () => {
+    unlockAudio()
     const recognition = recognitionRef.current;
     if (!activeRef.current || !recognition || recognitionRunningRef.current || phaseRef.current === 'Thinking...' || phaseRef.current === 'Speaking...' || phaseRef.current === 'Paused') return;
 
@@ -321,10 +344,19 @@ export default function VoiceTalkModal({ isOpen, onClose, companion, userName })
       changePhase('Speaking...');
 
       try {
-        await audio.play();
-      } catch {
-        finishAudio(true);
-      }
+  await audio.play();
+} catch (error) {
+  console.error("Audio playback failed:", {
+    name: error.name,
+    message: error.message,
+    browser: navigator.userAgent,
+    audioReadyState: audio.readyState,
+    audioSource: audio.currentSrc,
+  });
+  setErrorMessage(error.message)
+
+  finishAudio(true);
+}
     } catch (error) {
       if (!activeRef.current) return;
       changePhase('Error');
